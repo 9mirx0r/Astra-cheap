@@ -1,0 +1,125 @@
+{
+  "results": [
+    {
+      "case": "omission",
+      "variant": "local",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "a17372d6c4363148fd53be1bda36ea177a444bb4a920c3c26f783dc5cc3092c8:3",
+          "usage": {
+            "input_tokens": 19582,
+            "cached_input_tokens": 0,
+            "output_tokens": 82,
+            "reasoning_output_tokens": 48
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.287,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null,
+      "local_route": "full",
+      "locally_refreshed": false
+    },
+    {
+      "case": "contradiction",
+      "variant": "local",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "fce01bb63c073bdf2d1020cf08f0a1cfb6f89378091044d67f41cc50d95c15c0:3",
+          "usage": {
+            "input_tokens": 19601,
+            "cached_input_tokens": 0,
+            "output_tokens": 84,
+            "reasoning_output_tokens": 50
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 5.882,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null,
+      "local_route": "full",
+      "locally_refreshed": false
+    },
+    {
+      "case": "stale",
+      "variant": "local",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "b917c584dea40ecf1ecb870927696ae6eb71cb3df830db942efae3d59d453ca0:3",
+          "usage": {
+            "input_tokens": 19585,
+            "cached_input_tokens": 0,
+            "output_tokens": 69,
+            "reasoning_output_tokens": 35
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 5.327,
+          "answer": {
+            "action": "answer",
+            "cause": "E_CHANGED",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null,
+      "local_route": "full",
+      "locally_refreshed": true
+    }
+  ],
+  "model_identity_verified": false,
+  "quota_savings": null,
+  "scope": "real CLI calls on synthetic adverse fixtures; excludes development and parent review",
+  "limitations": [
+    "One pair per case; explicit index hints; not a general quality benchmark.",
+    "Packet omissions constructed deliberately; not evaluation of automatic selection.",
+    "Hash freshness is checked by host; model receives the stale status.",
+    "All followups are fresh CLI turns containing prior payload; startup overhead included."
+  ],
+  "quality_gate": true
+}

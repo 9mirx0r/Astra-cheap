@@ -20,4 +20,6 @@ This change repairs four legacy ledger validation gaps and introduces content-ad
 
 Do not run the experimental canary before each task. The existing real probe lacked effective model/effort metadata. Do not treat its constructed-metadata tests as native delegation verification.
 
+Local preparation is now available through scripts/local_handoff.py. Three real recovery cases passed in one turn each after fresh full evidence was selected locally. See ../validation/local-handoff-report.md. This removes the earlier expansion overhead for small files; it does not demonstrate savings over ordinary full evidence.
+
 The current historical benchmark contains no accepted runs. Its token difference cannot establish a quality-preserving saving or a subscription-quota reduction.
