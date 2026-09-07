@@ -1,5 +1,9 @@
 # Astra-cheap
 
+<p align="center">
+  <img src="assets/astra-cheaper.png" alt="Astra cheaper!" width="520">
+</p>
+
 `Astra-cheap` is a reusable Codex skill for doing complete work with less avoidable context, tool-output, and rework cost. It does not change model pricing, account limits, hidden reasoning, or provider settings. It changes how evidence is gathered and reused.
 
 ## What it changes
