@@ -40,10 +40,6 @@ In this pair, input tokens were 19.3% lower and cached input was 26.8% lower. Bo
 
 Those fields should not be read as a percentage of a Plus allowance; the host reports usage fields, not a direct five-hour quota conversion.
 
-## Qubis
-
-`assets/qubis-empty-pockets.png` is the project mascot illustration requested for the repository: Qubis showing empty pockets as a visual metaphor for wasted context budget.
-
 ## Use
 
 Invoke the skill when a task is long, evidence-heavy, or likely to be repeated:
