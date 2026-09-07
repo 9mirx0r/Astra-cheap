@@ -4,6 +4,7 @@ import argparse
 from collections import defaultdict
 from datetime import datetime, timezone
 import json
+import math
 from pathlib import Path
 import re
 import sys
@@ -33,7 +34,8 @@ def _nonnegative_int(value, field):
 
 
 def _nonnegative_number(value, field):
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+    if (isinstance(value, bool) or not isinstance(value, (int, float))
+            or not math.isfinite(value) or value < 0):
         raise ValueError(f'{field} must be a non-negative number')
     return float(value)
 
@@ -49,12 +51,16 @@ def validate_event(event):
         raise ValueError(f'unsupported status: {event["status"]}')
     if not isinstance(event['accepted'], bool):
         raise ValueError('accepted must be boolean')
+    if event['accepted'] and event['status'] != 'completed':
+        raise ValueError('accepted outcomes must have completed status')
     if not isinstance(event['usage'], dict) or set(event['usage']) != set(USAGE_FIELDS):
         raise ValueError('usage must contain exactly the four token counters')
     for field in USAGE_FIELDS:
         _nonnegative_int(event['usage'][field], f'usage.{field}')
     if event['usage']['cached_input_tokens'] > event['usage']['input_tokens']:
         raise ValueError('cached input cannot exceed input tokens')
+    if event['usage']['reasoning_output_tokens'] > event['usage']['output_tokens']:
+        raise ValueError('reasoning output cannot exceed output tokens')
     _nonnegative_int(event['retries'], 'retries')
     _nonnegative_number(event['elapsed_seconds'], 'elapsed_seconds')
     return event
@@ -84,6 +90,7 @@ def make_event(args):
 
 
 def record(ledger, event):
+    validate_event(event)
     ledger = Path(ledger)
     ledger.parent.mkdir(parents=True, exist_ok=True)
     with ledger.open('a', encoding='utf-8', newline='\n') as handle:
@@ -181,4 +188,3 @@ def main(argv=None):
 
 if __name__ == '__main__':
     raise SystemExit(main())
-

@@ -1,0 +1,97 @@
+test_direct_record_validates_before_creating_ledger (test_usage_ledger.UsageLedgerTests.test_direct_record_validates_before_creating_ledger) ... FAIL
+test_record_rejects_accepted_non_completed_status (test_usage_ledger.UsageLedgerTests.test_record_rejects_accepted_non_completed_status) ... FAIL
+test_record_rejects_negative_usage (test_usage_ledger.UsageLedgerTests.test_record_rejects_negative_usage) ... ok
+test_record_rejects_nonfinite_duration (test_usage_ledger.UsageLedgerTests.test_record_rejects_nonfinite_duration) ... FAIL
+test_record_rejects_reasoning_tokens_above_output (test_usage_ledger.UsageLedgerTests.test_record_rejects_reasoning_tokens_above_output) ... FAIL
+test_record_writes_bounded_structured_event (test_usage_ledger.UsageLedgerTests.test_record_writes_bounded_structured_event) ... ok
+test_summary_rejects_malformed_ledger_line (test_usage_ledger.UsageLedgerTests.test_summary_rejects_malformed_ledger_line) ... ok
+test_summary_reports_cost_per_accepted_outcome (test_usage_ledger.UsageLedgerTests.test_summary_reports_cost_per_accepted_outcome) ... ok
+
+======================================================================
+FAIL: test_direct_record_validates_before_creating_ledger (test_usage_ledger.UsageLedgerTests.test_direct_record_validates_before_creating_ledger)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 77, in test_direct_record_validates_before_creating_ledger
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_record_rejects_accepted_non_completed_status (test_usage_ledger.UsageLedgerTests.test_record_rejects_accepted_non_completed_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 103, in test_record_rejects_accepted_non_completed_status
+    self.run_cli(
+    ~~~~~~~~~~~~^
+        'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        '--reasoning-output-tokens', '0', '--retries', '0', '--elapsed-seconds', '0',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 25, in run_cli
+    self.assertEqual(result.returncode, expected,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     f'stdout={result.stdout}\nstderr={result.stderr}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : stdout={
+  "recorded": 1
+}
+
+stderr=
+
+======================================================================
+FAIL: test_record_rejects_nonfinite_duration (test_usage_ledger.UsageLedgerTests.test_record_rejects_nonfinite_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 83, in test_record_rejects_nonfinite_duration
+    self.run_cli(
+    ~~~~~~~~~~~~^
+        'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        '--reasoning-output-tokens', '0', '--retries', '0', '--elapsed-seconds', 'nan',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 25, in run_cli
+    self.assertEqual(result.returncode, expected,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     f'stdout={result.stdout}\nstderr={result.stderr}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : stdout={
+  "recorded": 1
+}
+
+stderr=
+
+======================================================================
+FAIL: test_record_rejects_reasoning_tokens_above_output (test_usage_ledger.UsageLedgerTests.test_record_rejects_reasoning_tokens_above_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 93, in test_record_rejects_reasoning_tokens_above_output
+    self.run_cli(
+    ~~~~~~~~~~~~^
+        'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        '--reasoning-output-tokens', '2', '--retries', '0', '--elapsed-seconds', '0',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 25, in run_cli
+    self.assertEqual(result.returncode, expected,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     f'stdout={result.stdout}\nstderr={result.stderr}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : stdout={
+  "recorded": 1
+}
+
+stderr=
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.484s
+
+FAILED (failures=4)

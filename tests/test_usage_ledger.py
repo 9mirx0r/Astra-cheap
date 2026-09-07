@@ -8,6 +8,8 @@ import unittest
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'usage_ledger.py'
+sys.path.insert(0, str(SCRIPT.parent))
+import usage_ledger
 
 
 class UsageLedgerTests(unittest.TestCase):
@@ -53,6 +55,61 @@ class UsageLedgerTests(unittest.TestCase):
             '--timestamp', '2026-09-06T12:00:00Z', expected=2)
         self.assertFalse(self.ledger.exists())
 
+    def test_direct_record_validates_before_creating_ledger(self):
+        ledger = self.root / 'new' / 'usage.jsonl'
+        event = {
+            'schema_version': 1,
+            'task_id': 'task-001',
+            'variant': 'baseline',
+            'model': 'gpt-test',
+            'reasoning_effort': 'low',
+            'status': 'completed',
+            'accepted': False,
+            'usage': {
+                'input_tokens': -1,
+                'cached_input_tokens': 0,
+                'output_tokens': 0,
+                'reasoning_output_tokens': 0,
+            },
+            'retries': 0,
+            'elapsed_seconds': 0.0,
+            'timestamp': '2026-09-06T12:00:00Z',
+        }
+        with self.assertRaises(ValueError):
+            usage_ledger.record(ledger, event)
+        self.assertFalse(ledger.exists())
+        self.assertFalse(ledger.parent.exists())
+
+    def test_record_rejects_nonfinite_duration(self):
+        self.run_cli(
+            'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+            '--variant', 'baseline', '--model', 'gpt-test', '--effort', 'low',
+            '--status', 'completed', '--accepted', 'false', '--input-tokens', '1',
+            '--cached-input-tokens', '0', '--output-tokens', '1',
+            '--reasoning-output-tokens', '0', '--retries', '0', '--elapsed-seconds', 'nan',
+            '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        self.assertFalse(self.ledger.exists())
+
+    def test_record_rejects_reasoning_tokens_above_output(self):
+        self.run_cli(
+            'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+            '--variant', 'baseline', '--model', 'gpt-test', '--effort', 'low',
+            '--status', 'completed', '--accepted', 'false', '--input-tokens', '1',
+            '--cached-input-tokens', '0', '--output-tokens', '1',
+            '--reasoning-output-tokens', '2', '--retries', '0', '--elapsed-seconds', '0',
+            '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        self.assertFalse(self.ledger.exists())
+
+    def test_record_rejects_accepted_non_completed_status(self):
+        self.run_cli(
+            'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+            '--variant', 'baseline', '--model', 'gpt-test', '--effort', 'low',
+            '--status', 'failed', '--accepted', 'true', '--input-tokens', '1',
+            '--cached-input-tokens', '0', '--output-tokens', '1',
+            '--reasoning-output-tokens', '0', '--retries', '0', '--elapsed-seconds', '0',
+            '--timestamp', '2026-09-06T12:00:00Z', expected=2)
+        self.assertFalse(self.ledger.exists())
+
     def test_summary_reports_cost_per_accepted_outcome(self):
         self.record('baseline', True, 100, 20)
         self.record('astra-cheap', False, 50, 10)
@@ -73,4 +130,3 @@ class UsageLedgerTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

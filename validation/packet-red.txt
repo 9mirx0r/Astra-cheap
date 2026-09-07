@@ -1,0 +1,23 @@
+...EE..
+======================================================================
+ERROR: test_packet_preserves_expansion_and_acceptance (test_evidence_receipts.EvidenceReceiptTests.test_packet_preserves_expansion_and_acceptance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_evidence_receipts.py", line 49, in test_packet_preserves_expansion_and_acceptance
+    packet = self.m.packet(pack, 'Find the failure', ['Cite the source line'])
+             ^^^^^^^^^^^^^
+AttributeError: module 'receipts' has no attribute 'packet'
+
+======================================================================
+ERROR: test_packet_without_acceptance_rejected (test_evidence_receipts.EvidenceReceiptTests.test_packet_without_acceptance_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_evidence_receipts.py", line 57, in test_packet_without_acceptance_rejected
+    self.m.packet({}, 'Find the failure', [])
+    ^^^^^^^^^^^^^
+AttributeError: module 'receipts' has no attribute 'packet'
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.017s
+
+FAILED (errors=2)

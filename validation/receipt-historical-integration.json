@@ -1,0 +1,21 @@
+{
+  "unique_calls": 2,
+  "known_totals": {
+    "input_tokens": 209914,
+    "cached_input_tokens": 153216,
+    "output_tokens": 658,
+    "reasoning_output_tokens": 51
+  },
+  "totals": {
+    "input_tokens": 209914,
+    "cached_input_tokens": 153216,
+    "output_tokens": 658,
+    "reasoning_output_tokens": 51
+  },
+  "quota_savings": null,
+  "usd_cost": null,
+  "limitation": "Declared source identities only; capsule freshness must be checked separately.",
+  "capsule_status": "dependencies_match",
+  "accepted_runs": 0,
+  "source": "previous real CLI measurements; no new inference"
+}
