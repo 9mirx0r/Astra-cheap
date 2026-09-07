@@ -9,9 +9,12 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from usage_ledger import record as record_usage
 
 
 def main():
@@ -27,6 +30,7 @@ def main():
         raise SystemExit('Output already exists; preserve prior measurements.')
     local = ROOT / '.local' / ('benchmark-' + str(time.time_ns()))
     local.mkdir(parents=True)
+    ledger_path = local / 'usage.jsonl'
     lines = ['Export job started; schema expected: invoice-v4']
     lines += [f'INFO stage=extract row={i:05d} scanned=ok' for i in range(4200)]
     lines += ['ERROR E_SCHEMA_MISMATCH record=INV-042 expected=invoice-v4 received=invoice-v3']
@@ -88,6 +92,25 @@ def main():
                     'elapsed_seconds': round(time.monotonic() - start, 2),
                     'usage': usage[-1] if usage else None, 'accepted': accepted,
                     'answer': responses, 'status': 'completed' if run.returncode == 0 else 'failed'}
+        if observed['usage']:
+            record_usage(ledger_path, {
+                'schema_version': 1,
+                'task_id': 'invoice_log_diagnosis',
+                'variant': variant,
+                'model': args.model,
+                'reasoning_effort': 'low',
+                'status': observed['status'],
+                'accepted': accepted,
+                'usage': {
+                    'input_tokens': observed['usage'].get('input_tokens', 0),
+                    'cached_input_tokens': observed['usage'].get('cached_input_tokens', 0),
+                    'output_tokens': observed['usage'].get('output_tokens', 0),
+                    'reasoning_output_tokens': observed['usage'].get('reasoning_output_tokens', 0),
+                },
+                'retries': 0,
+                'elapsed_seconds': observed['elapsed_seconds'],
+                'timestamp': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            })
         results.append(observed)
         print(json.dumps({k: v for k, v in observed.items() if k != 'answer'}), flush=True)
         if run.returncode != 0 or not usage:
@@ -100,6 +123,7 @@ def main():
               'fixture_sha256': hashlib.sha256(fixture.encode()).hexdigest(),
               'expected_error_line': error_line, 'source_characters': len(fixture),
               'results': results, 'quota_savings': None,
+              'ledger_records': sum(1 for item in results if item.get('usage')),
               'limitations': ['One pair, not a general benchmark.',
                               'Same CLI, model, effort, fixture and acceptance schema.',
                               'Global discovery and host instructions may still exist in both arms.',

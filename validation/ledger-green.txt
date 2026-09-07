@@ -1,0 +1,9 @@
+test_record_rejects_negative_usage (test_usage_ledger.UsageLedgerTests.test_record_rejects_negative_usage) ... ok
+test_record_writes_bounded_structured_event (test_usage_ledger.UsageLedgerTests.test_record_writes_bounded_structured_event) ... ok
+test_summary_rejects_malformed_ledger_line (test_usage_ledger.UsageLedgerTests.test_summary_rejects_malformed_ledger_line) ... ok
+test_summary_reports_cost_per_accepted_outcome (test_usage_ledger.UsageLedgerTests.test_summary_reports_cost_per_accepted_outcome) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.992s
+
+OK

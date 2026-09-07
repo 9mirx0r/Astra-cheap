@@ -31,6 +31,17 @@ python -B scripts/benchmark_local.py
 
 That benchmark validates bounded views, recovery of omitted lines, unchanged source files, dependency invalidation, and live refresh rules. It intentionally makes no claim about token savings.
 
+## Measuring accepted outcomes
+
+The local ledger records measured usage without storing prompts or responses. Each JSONL event contains the model, reasoning effort, token counters, retries, duration, variant, and whether the outcome was accepted. Summaries report total usage and **cost per accepted outcome**:
+
+```powershell
+python -B scripts/usage_ledger.py record --ledger .local/usage.jsonl --task-id task-001 --variant baseline --model model-name --effort low --status completed --accepted true --input-tokens 100 --cached-input-tokens 80 --output-tokens 20 --reasoning-output-tokens 2 --retries 0 --elapsed-seconds 1.2
+python -B scripts/usage_ledger.py summary --ledger .local/usage.jsonl
+```
+
+The model benchmark writes the same ledger beside its ignored raw artifacts. It does not select a model or effort automatically; measurement comes before routing decisions.
+
 ## Preliminary model measurement
 
 `benchmarks/astra-comparison.json` contains one real CLI pair using the same fixture, model, effort, schema, and order:

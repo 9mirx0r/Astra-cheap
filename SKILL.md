@@ -29,6 +29,8 @@ For a long artifact, first use native search or structured filtering. If repeat 
 
 For expensive static observations worth reusing, a dependency capsule records a claim, explicit files/trees, and expiry. `dependencies_match` means only those declared inputs match; it neither proves the claim nor guarantees complete dependencies. Include raw evidence and relevant configurations. Never use capsules alone to skip required acceptance, security, integration, or fresh-environment checks. Live observations always require refresh.
 
+For measured model work, record usage and acceptance with `scripts/usage_ledger.py`. Keep prompts and responses out of the ledger. Compare input, cached input, output, retries, and elapsed time per accepted outcome before changing model or effort policy.
+
 For multi-step work, keep a small working record only when it prevents substantial reconstruction: objective; next decision; established facts with evidence paths; unresolved contradictions; changed dependencies; next experiment. Maintain one current record rather than duplicating history. Store it in a permitted task-artifact location, never automatically in unrelated project files. For short work, keep it in the conversation.
 
 ## Avoid overhead that eats the savings

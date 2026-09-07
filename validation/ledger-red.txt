@@ -1,0 +1,60 @@
+test_record_rejects_negative_usage (test_usage_ledger.UsageLedgerTests.test_record_rejects_negative_usage) ... ok
+test_record_writes_bounded_structured_event (test_usage_ledger.UsageLedgerTests.test_record_writes_bounded_structured_event) ... FAIL
+test_summary_rejects_malformed_ledger_line (test_usage_ledger.UsageLedgerTests.test_summary_rejects_malformed_ledger_line) ... ok
+test_summary_reports_cost_per_accepted_outcome (test_usage_ledger.UsageLedgerTests.test_summary_reports_cost_per_accepted_outcome) ... FAIL
+
+======================================================================
+FAIL: test_record_writes_bounded_structured_event (test_usage_ledger.UsageLedgerTests.test_record_writes_bounded_structured_event)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 38, in test_record_writes_bounded_structured_event
+    result = self.record('baseline', True, 100, 20)
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 28, in record
+    return self.run_cli(
+           ~~~~~~~~~~~~^
+        'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        '--retries', '1', '--elapsed-seconds', '1.25',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--timestamp', '2026-09-06T12:00:00Z')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 23, in run_cli
+    self.assertEqual(result.returncode, expected,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     f'stdout={result.stdout}\nstderr={result.stderr}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : stdout=
+stderr=C:\Users\emir\AppData\Local\Programs\Python\Python314\python.exe: can't open file 'C:\\Users\\emir\\Astra-cheap\\scripts\\usage_ledger.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_summary_reports_cost_per_accepted_outcome (test_usage_ledger.UsageLedgerTests.test_summary_reports_cost_per_accepted_outcome)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 57, in test_summary_reports_cost_per_accepted_outcome
+    self.record('baseline', True, 100, 20)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 28, in record
+    return self.run_cli(
+           ~~~~~~~~~~~~^
+        'record', '--ledger', str(self.ledger), '--task-id', 'task-001',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        '--retries', '1', '--elapsed-seconds', '1.25',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--timestamp', '2026-09-06T12:00:00Z')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\emir\Astra-cheap\tests\test_usage_ledger.py", line 23, in run_cli
+    self.assertEqual(result.returncode, expected,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     f'stdout={result.stdout}\nstderr={result.stderr}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : stdout=
+stderr=C:\Users\emir\AppData\Local\Programs\Python\Python314\python.exe: can't open file 'C:\\Users\\emir\\Astra-cheap\\scripts\\usage_ledger.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.200s
+
+FAILED (failures=2)
