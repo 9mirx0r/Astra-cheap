@@ -1,0 +1,121 @@
+{
+  "results": [
+    {
+      "case": 0,
+      "variant": "direct",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "accepted": true,
+      "failure": null,
+      "turns": [
+        {
+          "source_id": "ea2e39bc79f774b77f0aeb27603204f4b46a467338ff4b952159bad7e7ce97b5:3",
+          "usage": {
+            "input_tokens": 22145,
+            "cached_input_tokens": 0,
+            "output_tokens": 73,
+            "reasoning_output_tokens": 41
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.146
+        }
+      ],
+      "preparation_seconds": 0
+    },
+    {
+      "case": 0,
+      "variant": "packet",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "accepted": true,
+      "failure": null,
+      "turns": [
+        {
+          "source_id": "07c528e2d2aa625856b39c11a42e13ecee4819c0c6e1941e9969808ae9f1e072:3",
+          "usage": {
+            "input_tokens": 16103,
+            "cached_input_tokens": 0,
+            "output_tokens": 77,
+            "reasoning_output_tokens": 45
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 4.75
+        }
+      ],
+      "preparation_seconds": 0.045317
+    },
+    {
+      "case": 1,
+      "variant": "packet",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "accepted": true,
+      "failure": null,
+      "turns": [
+        {
+          "source_id": "b2d0fddd438c1ddc1d189353f59535469a08a845930f2df1c8b5017b7e13ac16:3",
+          "usage": {
+            "input_tokens": 16110,
+            "cached_input_tokens": 0,
+            "output_tokens": 79,
+            "reasoning_output_tokens": 46
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 5.256
+        }
+      ],
+      "preparation_seconds": 0.043471
+    },
+    {
+      "case": 1,
+      "variant": "direct",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "accepted": true,
+      "failure": null,
+      "turns": [
+        {
+          "source_id": "5fe4e0b07466ac0282506902fa6709f2d9564b66fa24a16ad5d40e823348cdd9:3",
+          "usage": {
+            "input_tokens": 22146,
+            "cached_input_tokens": 0,
+            "output_tokens": 56,
+            "reasoning_output_tokens": 23
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.528
+        }
+      ],
+      "preparation_seconds": 0
+    }
+  ],
+  "quality_gate": true,
+  "model_identity_verified": false,
+  "quota_savings": null,
+  "scope": "CLI fixture execution only; excludes parent implementation and review",
+  "limitations": [
+    "Two synthetic tasks, one pair each; order alternated, cache uncontrolled.",
+    "No native spawn_agent verification; effective model and effort unavailable.",
+    "No generalized quality or subscription savings conclusion."
+  ]
+}
