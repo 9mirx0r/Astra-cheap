@@ -1,0 +1,62 @@
+test_absent_file_becoming_present_invalidates (test_astra_cheap.EvidenceTests.test_absent_file_becoming_present_invalidates) ... ok
+test_capsule_cannot_be_reused_across_roots (test_astra_cheap.EvidenceTests.test_capsule_cannot_be_reused_across_roots) ... ok
+test_capsule_cannot_include_itself_in_dependency_tree (test_astra_cheap.EvidenceTests.test_capsule_cannot_include_itself_in_dependency_tree) ... ok
+test_capsule_claim_is_bounded (test_astra_cheap.EvidenceTests.test_capsule_claim_is_bounded) ... FAIL
+test_capsule_requires_explicit_dependencies (test_astra_cheap.EvidenceTests.test_capsule_requires_explicit_dependencies) ... ok
+test_changed_source_cannot_be_expanded_as_old_evidence (test_astra_cheap.EvidenceTests.test_changed_source_cannot_be_expanded_as_old_evidence) ... ok
+test_cli_stale_capsule_returns_nonzero (test_astra_cheap.EvidenceTests.test_cli_stale_capsule_returns_nonzero) ... FAIL
+test_clock_rollback_cannot_extend_cache (test_astra_cheap.EvidenceTests.test_clock_rollback_cannot_extend_cache) ... ok
+test_content_change_invalidates_capsule (test_astra_cheap.EvidenceTests.test_content_change_invalidates_capsule) ... ok
+test_credential_filename_is_rejected (test_astra_cheap.EvidenceTests.test_credential_filename_is_rejected) ... ok
+test_empty_log_is_explicitly_empty_not_successful (test_astra_cheap.EvidenceTests.test_empty_log_is_explicitly_empty_not_successful) ... ok
+test_existing_output_is_preserved (test_astra_cheap.EvidenceTests.test_existing_output_is_preserved) ... ok
+test_expanded_long_line_marks_range_incomplete (test_astra_cheap.EvidenceTests.test_expanded_long_line_marks_range_incomplete) ... ok
+test_expiry_invalidates_even_unchanged_files (test_astra_cheap.EvidenceTests.test_expiry_invalidates_even_unchanged_files) ... ok
+test_file_replaced_by_directory_does_not_match (test_astra_cheap.EvidenceTests.test_file_replaced_by_directory_does_not_match) ... ok
+test_injected_log_is_data_not_a_gate (test_astra_cheap.EvidenceTests.test_injected_log_is_data_not_a_gate) ... ok
+test_known_secret_pattern_is_redacted_in_preview (test_astra_cheap.EvidenceTests.test_known_secret_pattern_is_redacted_in_preview) ... ok
+test_large_log_is_bounded_and_failure_is_visible (test_astra_cheap.EvidenceTests.test_large_log_is_bounded_and_failure_is_visible) ... ok
+test_live_observation_always_requires_refresh (test_astra_cheap.EvidenceTests.test_live_observation_always_requires_refresh) ... ok
+test_long_single_line_does_not_escape_budget (test_astra_cheap.EvidenceTests.test_long_single_line_does_not_escape_budget) ... ok
+test_omitted_evidence_can_be_recovered_by_line (test_astra_cheap.EvidenceTests.test_omitted_evidence_can_be_recovered_by_line) ... ok
+test_oversized_line_count_is_rejected_before_expansion (test_astra_cheap.EvidenceTests.test_oversized_line_count_is_rejected_before_expansion) ... FAIL
+test_pack_refuses_source_overwrite (test_astra_cheap.EvidenceTests.test_pack_refuses_source_overwrite) ... ok
+test_parent_escape_is_rejected (test_astra_cheap.EvidenceTests.test_parent_escape_is_rejected) ... ok
+test_small_log_is_complete (test_astra_cheap.EvidenceTests.test_small_log_is_complete) ... ok
+test_symlink_escape_is_rejected (test_astra_cheap.EvidenceTests.test_symlink_escape_is_rejected) ... ok
+test_tree_membership_change_invalidates (test_astra_cheap.EvidenceTests.test_tree_membership_change_invalidates) ... ok
+test_unchanged_capsule_is_only_a_dependency_match (test_astra_cheap.EvidenceTests.test_unchanged_capsule_is_only_a_dependency_match) ... ok
+test_unique_middle_error_not_lost_to_repeated_warnings (test_astra_cheap.EvidenceTests.test_unique_middle_error_not_lost_to_repeated_warnings) ... ok
+
+======================================================================
+FAIL: test_capsule_claim_is_bounded (test_astra_cheap.EvidenceTests.test_capsule_claim_is_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\.codex\skills\astra-cheap\tests\test_astra_cheap.py", line 207, in test_capsule_claim_is_bounded
+    with self.assertRaisesRegex(ValueError, 'claim'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_cli_stale_capsule_returns_nonzero (test_astra_cheap.EvidenceTests.test_cli_stale_capsule_returns_nonzero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\.codex\skills\astra-cheap\tests\test_astra_cheap.py", line 189, in test_cli_stale_capsule_returns_nonzero
+    self.assertEqual(run.returncode, 3, run.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 3 : {"status": "stale", "reasons": ["expired"], "claim": "Test observation only", "authority": "advisory_only", "proves_claim": false, "coverage": "declared_dependencies_only"}
+
+
+======================================================================
+FAIL: test_oversized_line_count_is_rejected_before_expansion (test_astra_cheap.EvidenceTests.test_oversized_line_count_is_rejected_before_expansion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\.codex\skills\astra-cheap\tests\test_astra_cheap.py", line 194, in test_oversized_line_count_is_rejected_before_expansion
+    with self.assertRaisesRegex(ValueError, 'lines'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 29 tests in 6.578s
+
+FAILED (failures=3)

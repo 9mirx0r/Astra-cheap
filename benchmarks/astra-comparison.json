@@ -1,0 +1,61 @@
+{
+  "model": "gpt-6-astra",
+  "effort": "low",
+  "task": "invoice_log_diagnosis",
+  "trials_per_variant": 1,
+  "order": "baseline_then_skill",
+  "fixture_sha256": "d5994f71b9697c01e766e172945897318d271b9ec18a1ffb03a34b401f27ed08",
+  "expected_error_line": 4202,
+  "source_characters": 201004,
+  "results": [
+    {
+      "variant": "baseline",
+      "returncode": 0,
+      "elapsed_seconds": 29.89,
+      "usage": {
+        "input_tokens": 116198,
+        "cached_input_tokens": 88448,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 333,
+        "reasoning_output_tokens": 21
+      },
+      "accepted": false,
+      "answer": {
+        "root_cause": "Undetermined: execution policy blocked all attempts to read logs/job.log, so no cause or exact line could be verified.",
+        "error_line": 0,
+        "wrapper_success_proves_export": false,
+        "next_check": "Provide the log contents or enable local read access. Check the export's own terminal status and output artifact; wrapper success alone does not prove export success. error_line 0 means unverified, not a log line."
+      },
+      "status": "completed"
+    },
+    {
+      "variant": "astra-cheap",
+      "returncode": 0,
+      "elapsed_seconds": 31.18,
+      "usage": {
+        "input_tokens": 93716,
+        "cached_input_tokens": 64768,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 325,
+        "reasoning_output_tokens": 30
+      },
+      "accepted": false,
+      "answer": {
+        "root_cause": "Undetermined: policy blocked local file reads, so I could not inspect logs/job.log or identify an exact error line.",
+        "error_line": 0,
+        "wrapper_success_proves_export": false,
+        "next_check": "Provide logs/job.log for inspection; 0 means the error line is unknown, not a log line. Verify the export\u2019s own terminal status and output artifact, including expected invoice count. Automatic approval review rejected the read commands as blocked by policy."
+      },
+      "status": "completed"
+    }
+  ],
+  "quota_savings": null,
+  "limitations": [
+    "One pair, not a general benchmark.",
+    "Same CLI, model, effort, fixture and acceptance schema.",
+    "Global discovery and host instructions may still exist in both arms.",
+    "Second-run cache/order effects are not controlled.",
+    "Token totals do not map directly to a Plus allowance percentage.",
+    "Mechanical acceptance is narrow; next-check semantics require human review."
+  ]
+}

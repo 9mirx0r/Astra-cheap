@@ -1,0 +1,4 @@
+interface:
+  display_name: "Astra-cheap"
+  short_description: "Reduce context and rework without weakening checks"
+  default_prompt: "Use $astra-cheap to complete this task with less repeated context and rework while preserving the full outcome and necessary verification."
