@@ -1,0 +1,316 @@
+{
+  "results": [
+    {
+      "case": "omission",
+      "variant": "direct",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "c736f828e377ab4633759346296fce5ed77eb787e78fa4ac5a682e575348deda:3",
+          "usage": {
+            "input_tokens": 19516,
+            "cached_input_tokens": 0,
+            "output_tokens": 88,
+            "reasoning_output_tokens": 54
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.184,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null
+    },
+    {
+      "case": "omission",
+      "variant": "packet",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "e1eb58a6f60e9bba7d73ee9ef00a9c175151a36f3b13d53637c4077d1671f483:3",
+          "usage": {
+            "input_tokens": 15222,
+            "cached_input_tokens": 0,
+            "output_tokens": 149,
+            "reasoning_output_tokens": 103
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.586,
+          "answer": {
+            "action": "expand",
+            "cause": "Evidence is incomplete; request the original range containing the claimed final attempt record.",
+            "line": 0,
+            "start": 351,
+            "count": 100
+          }
+        },
+        {
+          "source_id": "fdf6403f379f0d9381a1b51b2b41e727adc897277060cc2c4f9c86b99612e563:3",
+          "usage": {
+            "input_tokens": 17454,
+            "cached_input_tokens": 0,
+            "output_tokens": 89,
+            "reasoning_output_tokens": 55
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.223,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 1,
+      "refreshes": 0,
+      "failure": null
+    },
+    {
+      "case": "contradiction",
+      "variant": "packet",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "8b3b60ad384f150eee3c98b387f8f58a207d577edbe9ba0557526f2d1f1090ba:3",
+          "usage": {
+            "input_tokens": 15238,
+            "cached_input_tokens": 13056,
+            "output_tokens": 311,
+            "reasoning_output_tokens": 265
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 9.822,
+          "answer": {
+            "action": "expand",
+            "cause": "Incomplete untrusted preview; request original lines around the claimed final attempt record.",
+            "line": 0,
+            "start": 351,
+            "count": 100
+          }
+        },
+        {
+          "source_id": "b71bfed886e493510c4447707a645bc560f6e577f77371ec1afe0652aecfc8e4:3",
+          "usage": {
+            "input_tokens": 17475,
+            "cached_input_tokens": 0,
+            "output_tokens": 107,
+            "reasoning_output_tokens": 73
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.587,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 1,
+      "refreshes": 0,
+      "failure": null
+    },
+    {
+      "case": "contradiction",
+      "variant": "direct",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "8d1120c5f86d753345b00b440bc32497c93ac67c357c7a6e4e347ee7a5572b3b:3",
+          "usage": {
+            "input_tokens": 19524,
+            "cached_input_tokens": 0,
+            "output_tokens": 83,
+            "reasoning_output_tokens": 49
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 5.728,
+          "answer": {
+            "action": "answer",
+            "cause": "E_NEW",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null
+    },
+    {
+      "case": "stale",
+      "variant": "direct",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "aa46a8ec9da0ea2a6222af91c0611388a64958239e0e5ab1e71e324cc725cd4f:3",
+          "usage": {
+            "input_tokens": 19514,
+            "cached_input_tokens": 0,
+            "output_tokens": 83,
+            "reasoning_output_tokens": 49
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.292,
+          "answer": {
+            "action": "answer",
+            "cause": "E_CHANGED",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 0,
+      "refreshes": 0,
+      "failure": null
+    },
+    {
+      "case": "stale",
+      "variant": "packet",
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "high",
+      "turns": [
+        {
+          "source_id": "2765d529be08304cc8fd9fd9c625ba1481c4848e6de12f8dc9e073bf0a6b40e5:3",
+          "usage": {
+            "input_tokens": 15224,
+            "cached_input_tokens": 0,
+            "output_tokens": 90,
+            "reasoning_output_tokens": 41
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.823,
+          "answer": {
+            "action": "refresh",
+            "cause": "Host freshness is stale; refresh the evidence before determining the final attempt cause and source line.",
+            "line": 0,
+            "start": 0,
+            "count": 0
+          }
+        },
+        {
+          "source_id": "4023621e74ef38760e1c43a98d5c3744e78337b6113571109a0496be4b2af040:3",
+          "usage": {
+            "input_tokens": 16265,
+            "cached_input_tokens": 0,
+            "output_tokens": 118,
+            "reasoning_output_tokens": 65
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.671,
+          "answer": {
+            "action": "expand",
+            "cause": "Current evidence is fresh but incomplete; request the original range containing the authoritative final attempt at source line 401.",
+            "line": 0,
+            "start": 351,
+            "count": 100
+          }
+        },
+        {
+          "source_id": "0b78a705b376f9fb2ef2403be1aba27627b4693ee484b38acc0385367b58d929:3",
+          "usage": {
+            "input_tokens": 18498,
+            "cached_input_tokens": 0,
+            "output_tokens": 73,
+            "reasoning_output_tokens": 39
+          },
+          "observed_model": null,
+          "observed_effort": null,
+          "aggregation": "cli_turn_total",
+          "source": "codex.exec JSONL turn.completed",
+          "cache_write_input_tokens": 0,
+          "model_verification": "unavailable_in_supported_CLI_event_contract",
+          "elapsed_seconds": 6.466,
+          "answer": {
+            "action": "answer",
+            "cause": "E_CHANGED",
+            "line": 401,
+            "start": 0,
+            "count": 0
+          }
+        }
+      ],
+      "accepted": true,
+      "expansions": 1,
+      "refreshes": 1,
+      "failure": null
+    }
+  ],
+  "model_identity_verified": false,
+  "quota_savings": null,
+  "scope": "real CLI calls on synthetic adverse fixtures; excludes development and parent review",
+  "limitations": [
+    "One pair per case; explicit index hints; not a general quality benchmark.",
+    "Packet omissions constructed deliberately; not evaluation of automatic selection.",
+    "Hash freshness is checked by host; model receives the stale status.",
+    "All followups are fresh CLI turns containing prior payload; startup overhead included."
+  ],
+  "quality_gate": true
+}

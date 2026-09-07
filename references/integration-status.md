@@ -16,7 +16,7 @@ This change repairs four legacy ledger validation gaps and introduces content-ad
 - Derive stable source-event IDs from a supported telemetry contract. Arbitrary IDs and hashes do not authenticate runtime observations.
 - Separate attempt accounting from unique task acceptance; legacy cost_per_accepted_outcome is tokens per accepted record, not dollars or deduplicated completed tasks.
 - The packet builder is connected to an opt-in real CLI benchmark. See ../validation/packet-benchmark-report.md: four real turns passed exact acceptance across two simple cases, with effective model metadata unavailable.
-- Extend the comparison to cases requiring expansion and substantive work; include parent review and verify native delegation metadata before claiming end-to-end savings.
+- Recovery cases now have real evidence in ../validation/hard-packets-report.md: all six case/variant combinations passed, but packet input was about 97% higher. Keep packets optional. Substantive work, parent-review accounting, and native delegation attestation remain outstanding.
 
 Do not run the experimental canary before each task. The existing real probe lacked effective model/effort metadata. Do not treat its constructed-metadata tests as native delegation verification.
 

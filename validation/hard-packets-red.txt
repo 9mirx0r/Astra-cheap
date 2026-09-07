@@ -1,0 +1,17 @@
+E
+======================================================================
+ERROR: setUpClass (test_hard_packets.HardPacketTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\emir\Astra-cheap\tests\test_hard_packets.py", line 12, in setUpClass
+    s.loader.exec_module(cls.m)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\emir\\Astra-cheap\\benchmarks\\hard_packets.py'
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.001s
+
+FAILED (errors=1)
