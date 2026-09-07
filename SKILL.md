@@ -29,7 +29,11 @@ For a long artifact, first use native search or structured filtering. If repeat 
 
 For expensive static observations worth reusing, a dependency capsule records a claim, explicit files/trees, and expiry. `dependencies_match` means only those declared inputs match; it neither proves the claim nor guarantees complete dependencies. Include raw evidence and relevant configurations. Never use capsules alone to skip required acceptance, security, integration, or fresh-environment checks. Live observations always require refresh.
 
-For measured model work, record usage and acceptance with `scripts/usage_ledger.py`. Keep prompts and responses out of the ledger. Compare input, cached input, output, retries, and elapsed time per accepted outcome before changing model or effort policy.
+Prefer full relevant evidence for small sources. When preparing an authorized handoff, `scripts/local_handoff.py` refreshes the source locally and selects full evidence or a bounded pack. Its character threshold is a heuristic. Use a pack only when its benefit warrants setup and possible expansion; never force an answer from incomplete evidence.
+
+Measure useful work only from telemetry already exposed by the host. Missing usage is unknown, not zero. Requested model settings and self-reports do not establish effective settings. Do not run canaries or paid benchmarks automatically. For accounting limitations and a lightweight working record, consult [measurement](references/measurement.md) only when needed.
+
+Link capsules to accounting receipts with `scripts/evidence_receipts.py` when reuse warrants tracking. Deduplicate by receipt identity, retain unknown counters, and check capsule freshness separately. Hashes establish content identity, not truth or runtime authenticity. Evidence packets must preserve an expansion path and acceptance criteria.
 
 For multi-step work, keep a small working record only when it prevents substantial reconstruction: objective; next decision; established facts with evidence paths; unresolved contradictions; changed dependencies; next experiment. Maintain one current record rather than duplicating history. Store it in a permitted task-artifact location, never automatically in unrelated project files. For short work, keep it in the conversation.
 

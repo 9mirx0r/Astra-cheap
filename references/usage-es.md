@@ -1,7 +1,7 @@
 # Usar Astra-cheap
 
 La carpeta `astra-cheap` es una skill personal y portable. No depende de un proyecto concreto.
-En esta instalación está bajo `C:/Users/emir/.codex/skills/astra-cheap`.
+Instalala en la carpeta de skills personales de tu host.
 
 Invocación:
 
@@ -44,3 +44,16 @@ la ubicación de skills personales de ese host; los helpers requieren Python 3.1
 
 No hace falta comprimir tu forma de hablar. Describí normalmente lo que necesitás: la economía
 de ejecución es responsabilidad del agente, no del usuario.
+
+## Uso cotidiano
+
+Para archivos pequeños, conviene leer el contenido relevante completo. Antes de delegar,
+`local_handoff.py` puede actualizar la evidencia localmente. Los packs son opcionales: si
+provocan otra llamada para ampliar información, pueden terminar costando más.
+
+No se ejecutan canaries, benchmarks ni tests de la skill en cada tarea. Las mediciones usan
+sólo los datos que el host ya exponga; si faltan, quedan desconocidos. Un registro breve de
+decisiones y evidencia puede ayudar en trabajos largos, pero no hace falta para una consulta corta.
+
+La preferencia de modelo para subagentes la define el usuario en cada entorno. La skill no
+impone una selección global ni sustituye modelos silenciosamente.

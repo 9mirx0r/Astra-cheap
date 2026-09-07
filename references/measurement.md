@@ -14,7 +14,7 @@ pricing is not a permanent rate card; consult official current documentation onl
 
 ## Low-overhead evaluation
 
-First run the offline helper checks; they cost local compute, not model calls:
+When changing these helpers, run their relevant offline checks. Do not run this suite before ordinary user tasks:
 
 ```text
 python -B -m unittest discover -s <skill-folder>/tests -v
@@ -70,3 +70,26 @@ Design references (not runtime dependencies or guaranteed savings):
 
 This package's dependency capsules and decision-driven workflow are a local design, not a claim
 of research novelty or a replacement for a model benchmark.
+
+## Ordinary work: passive measurement
+
+Do useful work first. Reuse telemetry the host already exposes; do not launch a probe, read account credentials, or repeat model calls to populate a report. If usage is unavailable, state that once when accounting is requested. A usage-meter change alone does not attribute consumption to this task.
+
+For a substantial task, keep at most one small record in its authorized artifact directory:
+
+```text
+Task and acceptance criteria:
+Current decision / next useful action:
+Evidence paths and relevant hashes:
+Result: accepted / rejected / pending
+Requested model and effort:
+Observed model and effort: value with source, or unknown
+Usage: source and aggregation scope, or unknown
+Missing coverage, expansions, retries:
+```
+
+Do not create this record for a quick answer. Never copy entire prompts or transcripts into it. At a handoff, retain unresolved issues and evidence locations rather than replaying history.
+
+The legacy usage_ledger.py accepts caller-declared counters and settings. It requires all four counters: if any is unavailable, do not fabricate zero to satisfy it. Its cost_per_accepted_outcome is tokens per accepted record, not USD, quota, or unique accepted tasks. Use the working record above when metadata is incomplete. evidence_receipts.py supports unknown counters and deduplication by supplied source identity; it does not authenticate telemetry.
+
+Existing experiments: simple packs reduced input, adverse packs increased it, and local full-evidence preparation removed recovery overhead while matching ordinary full-read cost. See validation reports in the source repository. No general quota saving has been established. Do not run more benchmarks without a concrete unanswered question and user authorization.

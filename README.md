@@ -23,7 +23,7 @@ Long tasks accumulate repeated instructions, large command output, repository co
 
 ## Local validation
 
-The skill has 29 unit tests. The test-first record is stored in `validation/red.txt` and `validation/green.txt`. The local, no-model benchmark is reproducible with:
+Regression evidence is stored in `validation/`. Run the relevant tests when changing helpers, not before every user task. The local, no-model benchmark is reproducible with:
 
 ```powershell
 python -B scripts/benchmark_local.py
@@ -33,7 +33,7 @@ That benchmark validates bounded views, recovery of omitted lines, unchanged sou
 
 ## Measuring accepted outcomes
 
-The local ledger records measured usage without storing prompts or responses. Each JSONL event contains the model, reasoning effort, token counters, retries, duration, variant, and whether the outcome was accepted. Summaries report total usage and **cost per accepted outcome**:
+The legacy ledger records caller-declared usage without storing prompts or responses. Its settings are not runtime attestation, and its `cost_per_accepted_outcome` means tokens per accepted record, not dollars or unique accepted tasks. Use it only when all required counters are known. The following numbers are illustrative, not measured usage:
 
 ```powershell
 python -B scripts/usage_ledger.py record --ledger .local/usage.jsonl --task-id task-001 --variant baseline --model model-name --effort low --status completed --accepted true --input-tokens 100 --cached-input-tokens 80 --output-tokens 20 --reasoning-output-tokens 2 --retries 0 --elapsed-seconds 1.2
@@ -42,16 +42,31 @@ python -B scripts/usage_ledger.py summary --ledger .local/usage.jsonl
 
 The model benchmark writes the same ledger beside its ignored raw artifacts. It does not select a model or effort automatically; measurement comes before routing decisions.
 
-## Preliminary model measurement
+## Daily workflow
 
-`benchmarks/astra-comparison.json` contains one real CLI pair using the same fixture, model, effort, schema, and order:
+Read enough relevant evidence once. Prefer full relevant content for small sources. When a handoff needs preparation, `scripts/local_handoff.py` refreshes locally and selects full evidence or a bounded pack. Packs stay optional and retain an expansion path.
 
-| variant | input tokens | cached input | output tokens | reasoning output |
-| --- | ---: | ---: | ---: | ---: |
-| baseline | 116,198 | 88,448 | 333 | 21 |
-| with Astra-cheap | 93,716 | 64,768 | 325 | 30 |
+Use existing host telemetry when available. Do not launch probes or benchmarks just to fill an accounting report. For substantial work, keep one small record of decisions, evidence paths, unresolved issues, and observed usage; see [measurement](references/measurement.md). Unknown usage remains unknown.
 
-In this pair, input tokens were 19.3% lower and cached input was 26.8% lower. Both answers were marked `accepted: false` because the CLI policy prevented the model from reading the local fixture, so this is a **cost signal only**, not proof of quality equivalence. The project deliberately keeps that distinction visible.
+The experimental canary was retired from the installed skill. It could not attest native model/effort settings and added model calls. Native delegation attestation remains unresolved; requested settings are not runtime proof.
+
+## Evidence and accounting links
+
+`scripts/evidence_receipts.py` links a capsule hash to receipt hashes. Shared receipts are counted once across capsules; changed receipts and conflicting source identities are rejected. Unknown counters remain null, with known subtotals shown separately. Models are labeled requested; these receipts do not authenticate model execution or calculate subscription savings.
+
+The caller must supply stable atomic source-event IDs and persist the returned JSON. Capsule freshness still requires the existing status check. The historical integration in `validation/receipt-historical-integration.json` reuses prior real CLI usage; it is not a new model benchmark and has zero accepted runs.
+
+## What the measurements actually show
+
+The original pair in `benchmarks/astra-comparison.json` failed acceptance in both variants. It does not establish savings attributable to the skill. Later real CLI experiments found:
+
+| Experiment | Result |
+| --- | --- |
+| [Simple evidence](validation/packet-benchmark-report.md) | Both variants accepted; packets used about 27% less input. |
+| [Adverse recovery](validation/hard-packets-report.md) | Both variants accepted; packets used about 97% more input because of extra turns. |
+| [Local preparation](validation/local-handoff-report.md) | All three cases accepted in one turn; approximately ordinary full-read cost. |
+
+These are small synthetic experiments, with effective model identity unverified. They support selective use of helpers, not a blanket savings percentage. Benchmarks are opt-in and can themselves consume substantial model usage.
 
 Those fields should not be read as a percentage of a Plus allowance; the host reports usage fields, not a direct five-hour quota conversion.
 
