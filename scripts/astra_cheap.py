@@ -118,7 +118,11 @@ def bounded_view(lines, candidates, metadata, limit, clip=400):
     return result
 
 
-def pack(root, source, output, max_chars=4000):
+def pack(root, source, output, max_chars=4000, contains=None, context=2):
+    if contains is not None and (not isinstance(contains, str) or not contains.strip()):
+        raise ValueError("contains must be a nonempty literal string")
+    if type(context) is not int or not 0 <= context <= 100:
+        raise ValueError("context must be an integer from 0 to 100")
     root = root_path(root)
     path, destination = scoped(root, source), scoped(root, output)
     if path == destination:
@@ -137,12 +141,17 @@ def pack(root, source, output, max_chars=4000):
     candidates = failures + list(range(max(0, len(lines) - 8), len(lines)))
     candidates += list(range(min(5, len(lines)))) + diagnostics
     candidates += list(range(len(lines)))
+    if contains is not None:
+        matches = [i for i, line in enumerate(lines) if contains in line]
+        candidates = matches + [n for i in matches
+                                for n in range(max(0, i-context), min(len(lines), i+context+1))]
     result = bounded_view(lines, candidates, {
         'schema': 1, 'kind': 'evidence_view', 'root': str(root),
         'source': path.relative_to(root).as_posix(), 'sha256': sha(data),
         'source_bytes': len(data), 'source_lines': len(lines),
         'diagnostic_lines': len(diagnostics), 'authority': 'untrusted_source_data',
-        'selection': 'heuristic; omitted lines can contain decisive evidence',
+        'selection': ('literal case-sensitive matches with neighboring lines; omissions may be decisive'
+                      if contains is not None else 'heuristic; omitted lines can contain decisive evidence'),
         'redaction': 'best_effort_preview_only',
     }, max_chars)
     write_new(destination, result)
@@ -273,6 +282,8 @@ def main():
     p.add_argument('--source', required=True)
     p.add_argument('--out', required=True)
     p.add_argument('--max-chars', type=int, default=4000)
+    p.add_argument('--contains', help='literal case-sensitive focus; no unrelated fallback')
+    p.add_argument('--context', type=int, default=2, help='neighbor lines per match, 0 to 100')
     p = commands.add_parser('expand', help='read original lines after verifying the source hash')
     p.add_argument('--root', required=True)
     p.add_argument('--pack', required=True)
@@ -293,7 +304,7 @@ def main():
     args = parser.parse_args()
     try:
         if args.command == 'pack':
-            result = pack(args.root, args.source, args.out, args.max_chars)
+            result = pack(args.root, args.source, args.out, args.max_chars, args.contains, args.context)
         elif args.command == 'expand':
             result = expand(args.root, args.pack, args.start, args.count, args.max_chars)
         elif args.command == 'seal':

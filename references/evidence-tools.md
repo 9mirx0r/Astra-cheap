@@ -90,3 +90,7 @@ If a view hides the answer, expand once with a concrete range or search the orig
 helper is producing repeated expansion overhead, read the necessary original directly. If a
 capsule needs nearly the whole project to be meaningful, avoid building a giant dependency
 manifest merely to save a small read. Standard build/test dependency tracking may already be better.
+
+## Focus a saved view
+
+Pack optionally accepts --contains "literal" and --context 2 (0 to 100). Matching is case-sensitive on original lines; output retains best-effort redaction. Matches are prioritized before neighboring lines. The budget may omit matches or neighbors; inspect clipping and completeness. No matches produce an empty view without unrelated fallback, not a semantic absence verdict. Use an authorized non-secret search term. Existing expand works unchanged. For one-off searches, prefer native tools.

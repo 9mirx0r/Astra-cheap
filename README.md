@@ -26,6 +26,23 @@ The skill guides decisions when loaded. It is not an always-running optimizer.
 
 Keep the same acceptance criteria and required checks. Shorter explanations and fewer lines of code are not useful savings if the result is incomplete.
 
+## Recent improvements
+
+- **Decision-focused views:** the existing pack command accepts a case-sensitive literal and neighboring lines. Use a job ID, test name, or other concrete clue instead of asking for a generic summary.
+- **Repeated-recovery guard:** local_handoff.py refuses another large pack after two caller-declared recoveries of the same source hash. Continue with targeted native reading; expansion counting is not automatic.
+- **Failed-approach memory:** record costly attempts, evidence, alternatives, and retry conditions in the existing checkpoint. Retrieval is manual; this is not a background memory service.
+
+For an existing authorized log, write a new view file:
+
+```powershell
+python -B scripts/astra_cheap.py pack --root . --source logs/run.log --out job-view.json --contains "job[7]" --context 2 --max-chars 4000
+python -B scripts/astra_cheap.py expand --root . --pack job-view.json --start 1 --count 20
+```
+
+The literal is not a regex or semantic query. Matching lines take priority over neighbors; the budget can omit or clip either. No match returns an empty view, not a conclusion about success or root cause. Original line numbers, source hash, clipping flags, and expansion remain available. Expansion rejects changed sources. Prefer native search when no saved view is needed.
+
+These changes run locally or guide agent decisions. They do not demonstrate quota savings. [Filter validation](validation/focus-filter.md) records the failing test, passing suite, and real CLI check.
+
 ## What runs automatically?
 
 | Capability | Actual behavior |
