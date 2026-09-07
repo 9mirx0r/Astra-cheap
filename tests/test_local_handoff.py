@@ -42,3 +42,27 @@ class LocalHandoffTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
                 self.m.prepare(Path(d),'run.log',full_limit=-1)
+
+    def test_repeated_expansions_stop_repacking_same_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d); (p/'run.log').write_text('routine\n'*5000)
+            initial = self.m.prepare(p,'run.log',full_limit=2000,pack_limit=1500)
+            with self.assertRaisesRegex(ValueError, 'targeted native read'):
+                self.m.prepare(p,'run.log',previous_sha256=initial['evidence']['sha256'],
+                               full_limit=2000,pack_limit=1500,recovery_attempts=2)
+
+    def test_changed_source_does_not_inherit_recovery_count(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d); (p/'run.log').write_text('routine\n'*5000)
+            result = self.m.prepare(p,'run.log',previous_sha256='0'*64,
+                                    full_limit=2000,pack_limit=1500,recovery_attempts=2)
+            self.assertEqual(result['route'], 'pack')
+            self.assertTrue(result['refreshed'])
+
+    def test_recovery_count_requires_valid_identity(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d); (p/'run.log').write_text('small')
+            for count, fingerprint in [(True,'0'*64),(-1,'0'*64),(2,None),(2,'invalid')]:
+                with self.subTest(count=count, fingerprint=fingerprint):
+                    with self.assertRaises(ValueError):
+                        self.m.prepare(p,'run.log',previous_sha256=fingerprint,recovery_attempts=count)

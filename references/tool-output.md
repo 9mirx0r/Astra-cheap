@@ -25,3 +25,9 @@ Do not prefix arbitrary PowerShell pipelines or mutation commands. RTK is option
 ## Local observation
 
 On 2026-09-07, Get-Command returned no RTK executable in this host's PATH. No RTK command or runtime integration was tested, and no installation or configuration change was made. Native filtering remains the active path.
+
+## Repeated recovery
+
+Pass --recovery-attempts 2 and --previous-sha256 to local_handoff.py after two expansions in the same task. For an unchanged source exceeding the full-read budget, it exits 2 without a new pack. Continue with targeted native reading; do not stop the task. Small sources still use full evidence; changed sources do not inherit the count.
+
+The count is caller-observed, task-local, and hash-bound. There is no automatic tracking or persistent preference. Two is a heuristic, not a measured economic break-even point. Existing callers default to zero.

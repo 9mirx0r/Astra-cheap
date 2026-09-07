@@ -21,7 +21,7 @@ Complete the requested work with fewer unnecessary steps. Preserve acceptance cr
 
 - For noisy command output, use native filtering first. If RTK is already available, consult [selective RTK use](references/tool-output.md) before the first use in a host. No automatic installation or global hooks.
 - For repeated large sources or stale evidence, see [evidence tools](references/evidence-tools.md). The existing pack/expand and capsule helpers are optional. Hashes establish identity, not truth; matching declared dependencies does not prove they are complete.
-- For an authorized handoff, `scripts/local_handoff.py` refreshes evidence locally and chooses full content or a recoverable pack. Its size threshold is heuristic.
+- For an authorized handoff, `scripts/local_handoff.py` refreshes evidence locally and chooses full content or a recoverable pack. Its size threshold is heuristic. After two expansions for the same task and source hash, pass --recovery-attempts 2 with --previous-sha256; if repacking is rejected, continue with a targeted native read. Do not reset the count to bypass the guard.
 - For substantial work that would otherwise need reconstruction, persist one short checkpoint in a permitted artifact location: objective, evidence paths, changed dependencies, unresolved questions, next action. Skip this for short tasks.
 - Use [measurement](references/measurement.md) only when accounting is needed. Collect already available telemetry during useful work. Unknown usage remains unknown; no automatic canaries, paid benchmarks, or per-task helper test suites. Receipt linking is optional and does not authenticate runtime settings.
 
