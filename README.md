@@ -55,6 +55,7 @@ Extra calls can erase the benefit of smaller inputs. Measure during useful work;
 
 - [Evidence tools](references/evidence-tools.md): recoverable views and dependency capsules.
 - [Measurement](references/measurement.md): accounting limitations and evaluation guidance.
+- [Decision memory](references/decision-memory.md): retain costly failed approaches and explicit retry conditions in the existing checkpoint.
 - [Historical accounting details](references/accounting-history.md): receipts and the retired canary.
 - [Spanish usage guide](references/usage-es.md).
 
