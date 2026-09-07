@@ -1,55 +1,30 @@
 ---
 name: astra-cheap
-description: Reduce avoidable Astra context, tool-output, and rework costs while preserving task completeness and verification. Use when the user invokes Astra-cheap or requests quota-conscious work across coding, research, writing, analysis, or operations.
+description: Reduce avoidable context and rework when the user requests quota-conscious work or invokes Astra-cheap.
 metadata:
-  short-description: Efficient Astra work with recoverable evidence
+  short-description: Less overhead, with recoverable evidence
 ---
 
 # Astra-cheap
 
-Keep Astra's judgment; spend less attention on repeated material. Optimize **cost per accepted outcome**, including retries and verification, rather than reply length or minimum code size. This skill changes workflow, not model pricing, account limits, or hidden reasoning controls. Savings and unchanged quality must be measured, not promised.
+Complete the requested work with fewer unnecessary steps. Preserve acceptance criteria, required checks, security, accessibility, and the user's model choices. Savings are unproven until measured across accepted outcomes, including retries and review.
 
-## Operating contract
+## Choose the least expensive adequate path
 
-Preserve the user's actual deliverable, constraints, chosen model, and required checks. Never narrow acceptance criteria, omit difficult cases, weaken tests, or stop necessary work to hit an arbitrary token target. Continue an active task after answering a side question. Do not turn efficiency into a second project unless asked.
+- Before adding code or infrastructure, check whether the requested behavior already exists or can use the platform, standard library, or an installed dependency. Keep the smallest maintainable change; do not compress code at the expense of clarity.
+- Read small relevant sources directly. Search or filter large output locally **before** bringing it into model context. Avoid a model call just to summarize another tool's output.
+- Use bounded evidence only when setup and likely expansion cost less than a direct read. Expand on missing information or contradictions; a clipped view cannot establish absence or exhaustive coverage.
+- Reuse established facts while their dependencies remain valid. Refresh live state and required acceptance evidence. Stop investigating when the required checks resolve the task.
+- Delegate only when authorized and an independent, bounded task warrants startup and review overhead. Pass the question, acceptance criteria, relevant evidence, and an expansion path. Honor the user's model/effort restrictions; requested settings do not attest effective settings.
 
-Use ordinary concise language. Preserve numbers, negation, uncertainty, citations, exact commands, code, and errors. Give more explanation when the user asks or when a decision needs it. Do not default to cryptic prose.
+## Optional tools, only when needed
 
-## Spend attention where it changes a decision
+- For noisy command output, use native filtering first. If RTK is already available, consult [selective RTK use](references/tool-output.md) before the first use in a host. No automatic installation or global hooks.
+- For repeated large sources or stale evidence, see [evidence tools](references/evidence-tools.md). The existing pack/expand and capsule helpers are optional. Hashes establish identity, not truth; matching declared dependencies does not prove they are complete.
+- For an authorized handoff, `scripts/local_handoff.py` refreshes evidence locally and chooses full content or a recoverable pack. Its size threshold is heuristic.
+- For substantial work that would otherwise need reconstruction, persist one short checkpoint in a permitted artifact location: objective, evidence paths, changed dependencies, unresolved questions, next action. Skip this for short tasks.
+- Use [measurement](references/measurement.md) only when accounting is needed. Collect already available telemetry during useful work. Unknown usage remains unknown; no automatic canaries, paid benchmarks, or per-task helper test suites. Receipt linking is optional and does not authenticate runtime settings.
 
-1. Identify the next consequential uncertainty and the evidence that could resolve it. Keep this lightweight; a simple question needs no written plan.
-2. Prefer the smallest adequate observation: a symbol and its callers, a relevant passage, a failing test, a filtered log, or a specific data query. Broaden when coverage, contradictions, or the user's scope require it. For an exhaustive audit, maintain complete coverage rather than sampling away the assignment.
-3. Batch independent reads or checks that answer the same decision. Inspect every result. Keep dependent actions sequential. Parallel models are not presumed cheaper and require normal authorization.
-4. Reuse earlier observations only while their dependencies and scope remain valid. An unchanged document can preserve a quotation; it cannot prove a service is alive or a price is current. Read originals at important decision boundaries.
-5. When repeated investigation adds no evidence, change the experiment rather than rephrase the same search. When required checks establish the result, deliver it instead of adding speculative improvements or redundant test runs.
+Keep commands, errors, uncertainty, and necessary explanations intact. Do not change providers, model settings, global configuration, or account traffic to save tokens. This skill cannot control caching, compaction, hidden reasoning, or subscription accounting.
 
-## Keep evidence outside repeated context
-
-For a long artifact, first use native search or structured filtering. If repeat access justifies a saved view, use the local helper described in [evidence-tools.md](references/evidence-tools.md). It produces a bounded view with source hash, line numbers, clipping flags, and access to omitted lines. A heuristic view is **not exhaustive**. Missing text, empty output, and successful wrapper execution are never evidence of task success.
-
-For expensive static observations worth reusing, a dependency capsule records a claim, explicit files/trees, and expiry. `dependencies_match` means only those declared inputs match; it neither proves the claim nor guarantees complete dependencies. Include raw evidence and relevant configurations. Never use capsules alone to skip required acceptance, security, integration, or fresh-environment checks. Live observations always require refresh.
-
-Prefer full relevant evidence for small sources. When preparing an authorized handoff, `scripts/local_handoff.py` refreshes the source locally and selects full evidence or a bounded pack. Its character threshold is a heuristic. Use a pack only when its benefit warrants setup and possible expansion; never force an answer from incomplete evidence.
-
-Measure useful work only from telemetry already exposed by the host. Missing usage is unknown, not zero. Requested model settings and self-reports do not establish effective settings. Do not run canaries or paid benchmarks automatically. For accounting limitations and a lightweight working record, consult [measurement](references/measurement.md) only when needed.
-
-Link capsules to accounting receipts with `scripts/evidence_receipts.py` when reuse warrants tracking. Deduplicate by receipt identity, retain unknown counters, and check capsule freshness separately. Hashes establish content identity, not truth or runtime authenticity. Evidence packets must preserve an expansion path and acceptance criteria.
-
-For multi-step work, keep a small working record only when it prevents substantial reconstruction: objective; next decision; established facts with evidence paths; unresolved contradictions; changed dependencies; next experiment. Maintain one current record rather than duplicating history. Store it in a permitted task-artifact location, never automatically in unrelated project files. For short work, keep it in the conversation.
-
-## Avoid overhead that eats the savings
-
-- Do not load all references or run all helpers. Use the plain tool directly if setup would cost more than the avoided work.
-- Keep full logs on disk when already authorized; bring summaries and relevant failures into context. Read the full necessary section before deciding.
-- Do not reread unchanged instructions already available in the current context unless required. Never bypass governing rules; suggest deduplication separately when useful.
-- Do not silently change model, effort, speed tier, providers, installed tools, or global configuration. Do not intercept account traffic, collect credentials, or claim to control automatic prompt caching.
-- At task boundaries, a concise handoff can reduce future reconstruction. Do not open new tasks or discard useful context without the user's request; a fresh task also has startup cost.
-
-## Conditional references
-
-- Large logs, repeated reads, stale evidence: [local tools](references/evidence-tools.md).
-- Coding, writing, research, data, or operations decisions: [domain playbook](references/playbook.md), only the relevant section.
-- Measuring actual benefit or adjusting the approach: [measurement](references/measurement.md).
-- User-facing setup and usage in Spanish: [usage guide](references/usage-es.md).
-
-Before completion, check the requested outcome, required validation, and material uncertainty. Report results and limitations once, with evidence links when useful. Concision must not hide incomplete work.
+Load only the reference needed for the current decision. Do not turn ordinary work into an optimization project.
