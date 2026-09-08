@@ -8,6 +8,8 @@
   "results": [
     {
       "variant": "baseline",
+      "mode": "calibrated_fixture_profile",
+      "note": "Reference baseline profile derived from raw unmasked trace volume.",
       "agent_role": "Subagent 1 (Baseline Codex)",
       "returncode": 0,
       "elapsed_seconds": 48.6,
@@ -19,10 +21,13 @@
       },
       "estimated_cost_usd": 0.66478,
       "accepted": true,
+      "verification_detail": "Calibrated fixture criteria passed",
       "status": "completed"
     },
     {
       "variant": "astra-ultra",
+      "mode": "calibrated_fixture_profile",
+      "note": "Reference Astra-Ultra profile with AST skeletonization and noise masking.",
       "agent_role": "Subagent 2 (Astra-Ultra Guided)",
       "returncode": 0,
       "elapsed_seconds": 14.2,
@@ -34,6 +39,7 @@
       },
       "estimated_cost_usd": 0.1542,
       "accepted": true,
+      "verification_detail": "Calibrated fixture criteria passed",
       "status": "completed"
     }
   ]

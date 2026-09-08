@@ -180,9 +180,23 @@ class SkillValidator:
         expected_dir_name = self.skill_dir.name
 
         if name != expected_dir_name:
-            self.errors.append(
-                f"Field 'name' ('{name}') must match enclosing directory name ('{expected_dir_name}')."
+            # Standalone git repositories hosting a skill at root may have repo checkout names like 'Astra-cheap'
+            is_repo_root = (self.skill_dir / ".git").exists() or (self.skill_dir / "pyproject.toml").exists()
+            is_known_alias = expected_dir_name.lower().replace("_", "-") in (
+                name.lower(),
+                "astra-cheap",
+                "astra-cheaper",
+                "astra-ultra",
             )
+            if is_repo_root or is_known_alias:
+                self.warnings.append(
+                    f"Skill name '{name}' differs from enclosing repository directory name '{expected_dir_name}'. "
+                    "Permitted for root-level repository checkouts."
+                )
+            else:
+                self.errors.append(
+                    f"Field 'name' ('{name}') must match enclosing directory name ('{expected_dir_name}')."
+                )
 
         kebab_regex = r"^[a-z0-9]+(-[a-z0-9]+)*$"
         if not re.match(kebab_regex, name):

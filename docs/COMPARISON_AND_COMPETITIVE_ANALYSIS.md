@@ -76,7 +76,7 @@ This document presents a rigorous technical comparison between **Astra-Ultra** a
   - The coding model receives syntactically invalid code, hallucinates syntax errors, writes patches to fix non-existent missing brackets, and enters an **infinite recursive repair loop**.
   - **Empirical Result**: Burning 5x to 10x MORE tokens trying to repair unparseable code than the compressor saved.
 * **How Astra-Ultra Solves This**:
-  Astra-Ultra enforces **100% Verbatim Syntax Integrity**. Rather than probabilistic character drops, Astra-Ultra uses valid AST elision (`...`) and bounded windowing, guaranteeing that every injected line is 100% syntactically valid code.
+  Astra-Ultra enforces **Verbatim Syntax Integrity**. Rather than probabilistic character drops, Astra-Ultra uses valid AST elision (`...`) and bounded windowing to ensure that inspected code blocks remain syntactically valid code.
 
 ---
 
@@ -121,4 +121,4 @@ Astra-Ultra does not rely on speculative prompt tricks or lossy probabilistic co
 - **Hardware-Invariant Prefix Locking** (tailored specifically for OpenAI's 1,024-token / 128-slice prompt cache)
 - **Universal Reasoning Governor** (specifically protecting Luna 5.6 High and o1/o3-mini from CoT burn)
 
-This synthesis guarantees **70%–85% token reductions, >90% prompt cache hit rates, and up to 3.4x wall-clock speedups** with zero loss of semantic precision.
+This synthesis targets **significant token reductions, improved prompt cache hit rates, and faster execution cycles** without loss of structural code validity.

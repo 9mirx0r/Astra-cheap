@@ -2,7 +2,7 @@
 """Astra-Ultra Hardware-Invariant Prefix Locking for OpenAI Codex.
 
 Freezes Layer 1 & 2 invariants with SHA-256 Merkle root validation.
-Ensures static prefix integrity to guarantee 100% cache hits on OpenAI's
+Ensures static prefix integrity to maximize cache hit rates on OpenAI's
 1,024-token prompt caching boundary with 128-token increments.
 """
 
@@ -119,7 +119,7 @@ def verify_manifest(root_dir: Path, manifest_path: Path) -> Tuple[bool, str]:
     if curr_merkle != data.get("merkle_root"):
         return False, f"Merkle root mismatch: expected {data.get('merkle_root')[:8]}, computed {curr_merkle[:8]}"
 
-    return True, "Prefix invariants locked and verified (100% cache-ready)"
+    return True, "Prefix invariants locked and verified (cache-ready)"
 
 
 def estimate_tokens(text: str) -> int:

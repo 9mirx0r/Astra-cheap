@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Astra-Ultra Benchmark Chart Generator.
 
 Renders ASCII terminal charts and interactive HTML dashboards comparing
@@ -61,9 +61,12 @@ def generate_ascii_report(data: Dict[str, Any]) -> str:
     in_savings = ((base_in - ultra_in) / base_in * 100) if base_in > 0 else 0
     cache_rate_ultra = (ultra_cached / ultra_in * 100) if ultra_in > 0 else 0
 
+    is_live = any(r.get("mode") == "live_codex_execution" for r in results)
+    mode_label = "LIVE BENCHMARK" if is_live else "WORKLOAD PROFILE [Calibrated Fixture]"
+
     lines = [
         "=" * 70,
-        f"  ASTRA-ULTRA EMPIRICAL BENCHMARK: {model.upper()} (Effort: {effort.upper()})",
+        f"  ASTRA-ULTRA {mode_label}: {model.upper()} (Effort: {effort.upper()})",
         "=" * 70,
         "",
         "1. TOTAL INPUT TOKENS (Lower is Better)",
@@ -71,7 +74,7 @@ def generate_ascii_report(data: Dict[str, Any]) -> str:
         render_ascii_bar("Astra-Ultra", ultra_in, max_in, unit="tok"),
         f"   >> Net Input Token Savings: {in_savings:+.1f}%",
         "",
-        "2. CACHED PROMPT TOKENS (OpenAI 50% Discount Volume)",
+        "2. CACHED PROMPT TOKENS (OpenAI Prompt Cache Volume)",
         render_ascii_bar("Baseline", base_cached, max_cached, unit="tok"),
         render_ascii_bar("Astra-Ultra", ultra_cached, max_cached, unit="tok"),
         f"   >> Astra-Ultra Prompt Cache Hit Ratio: {cache_rate_ultra:.1f}%",
@@ -115,6 +118,9 @@ def generate_html_dashboard(data: Dict[str, Any], output_html: Path) -> None:
     base_time = base.get("elapsed_seconds", 29.89)
     ultra_time = ultra.get("elapsed_seconds", 8.42)
 
+    is_live = any(r.get("mode") == "live_codex_execution" for r in results)
+    mode_text = "Live Codex CLI Execution" if is_live else "Calibrated Workload Profile"
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,7 +148,8 @@ def generate_html_dashboard(data: Dict[str, Any], output_html: Path) -> None:
   <div class="container">
     <div class="badge">OpenAI Codex Engine</div>
     <h1>Astra-Ultra Benchmark: {model}</h1>
-    <p style="color: #94a3b8;">Comparison between Unoptimized Baseline and Astra-Ultra with reasoning effort <strong>{effort}</strong>.</p>
+    <p style="color: #94a3b8;">Comparison between Unoptimized Baseline and Astra-Ultra with reasoning effort <strong>{effort}</strong>. Mode: <strong>{mode_text}</strong>.</p>
+    <div style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Note: Calibrated profiles represent structural AST and log-filter token projections. Set ASTRA_BENCHMARK_LIVE=1 for live Codex subagent runs.</div>
     
     <div class="grid">
       <div class="card">

@@ -1,6 +1,6 @@
 # Guía Rápida de Astra-Ultra
 
-**Astra-Ultra** es una skill personal y modular para **OpenAI Codex** y sus modelos (**Luna 5.6**, **Terra**, **o1**, **o3-mini**, **o3** y **GPT-4o**). Su propósito es sencillo: **reducir el consumo de tokens hasta un 80% manteniendo el 100% de la calidad de tu código**.
+**Astra-Ultra** es una skill personal y modular para **OpenAI Codex** y sus modelos (**Luna 5.6**, **Terra**, **o1**, **o3-mini**, **o3** y **GPT-4o**). Su propósito es sencillo: **optimizar el consumo de tokens y maximizar el reúso de contexto manteniendo la integridad sintáctica de tu código**.
 
 ---
 
@@ -19,7 +19,7 @@ O simplemente describí lo que necesitás de forma natural. La economía de toke
 ## 2. Los 5 Mecanismos Clave (En palabras simples)
 
 1. **Bloqueo de Caché y Cuantización a 128 Tokens (`astra_prefix_lock.py`):**
-   OpenAI almacena en caché instrucciones estáticas en múltiplos de 128 tokens a partir de 1,024 tokens. Astra-Ultra congela las cabeceras fijas y alinea el texto estático para asegurar que el **90%+ de tus llamadas aprovechen el 50% de descuento en tokens de entrada**.
+   OpenAI almacena en caché instrucciones estáticas en múltiplos de 128 tokens a partir de 1,024 tokens. Astra-Ultra congela las cabeceras fijas y alinea el texto estático para **ayudar a estabilizar prefijos y mejorar las probabilidades de reúso de caché (aprovechando los descuentos del 50% al 90% en tokens de entrada)**.
 
 2. **Mapa del Repositorio en <1,024 Tokens (`astra_repomap.py`):**
    En lugar de volcar carpetas enteras en el chat, calcula qué archivos y funciones son las más importantes usando PageRank y las resume en menos de 1,024 tokens.
@@ -31,7 +31,7 @@ O simplemente describí lo que necesitás de forma natural. La economía de toke
    Cuando corrés tests (`pytest`, `cargo`, `npm`), no deja que 5,000 líneas de logs inunden el contexto. Guarda el log completo en el disco y te muestra solo el resumen y las últimas 25 líneas con el error exacto.
 
 5. **Protocolo Asimétrico para Luna 5.6 High (`astra_governor.py`):**
-   Los modelos de razonamiento profundo gastan miles de tokens pensando. Poner a Luna 5.6 High a buscar archivos gasta tu límite de 5 horas enseguida. Astra-Ultra hace la búsqueda con herramientas livianas y le entrega a Luna **solo la función de 30 líneas con el bug en 1 único turno** para que resuelva la lógica matemática o concurrente.
+   Los modelos de razonamiento profundo gastan miles de tokens pensando. Poner a Luna 5.6 High a buscar archivos gasta tu límite de 5 horas enseguida. Astra-Ultra hace la búsqueda con herramientas livianas y le entrega a Luna **solo la función de 30 líneas con el bug en turnos acotados** para que resuelva la lógica matemática o concurrente.
 
 ---
 
@@ -58,4 +58,4 @@ astra-ultra govern --asymmetric
 ## 4. Garantía de Calidad
 
 - **Cero distorsión de sintaxis:** No usamos compresión agresiva destructiva (como LLMLingua) que rompe indentación o tipos.
-- **80 tests deterministas:** Cada herramienta está respaldada por una suite de pruebas unitarias que podés correr en cualquier momento con `python -m unittest discover -s tests`.
+- **81 tests deterministas:** Cada herramienta está respaldada por una suite de pruebas unitarias que podés correr en cualquier momento con `python -m unittest discover -s tests`.

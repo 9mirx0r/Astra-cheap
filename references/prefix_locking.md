@@ -4,14 +4,14 @@
 
 * **Threshold**: Activates strictly for prompts with at least **1,024 tokens**.
 * **Increments**: Expands in **128-token blocks**.
-* **Discount**: **50% discount** on input tokens (`cached_tokens`).
+* **Discount**: **50% to 90% discount** on cached input tokens (`cached_tokens`) depending on model tier.
 * **Inactivity TTL**: Persists for 5–10 minutes of idle time.
 
 ---
 
 ## 2. Invariance Preservation Rules
 
-To guarantee 100% prompt cache hit rates:
+To maximize prompt cache hit rates:
 1. **Zero Dynamic Metadata in Head**: Never place dynamic timestamps, request UUIDs, or floating session variables at token 0.
 2. **Deterministic File Ordering**: Static system instructions $\to$ tool schemas $\to$ `AGENTS.md` $\to$ `SKILL.md` $\to$ RepoMap ($\le 1,024$ tokens).
 3. **CRLF Canonicalization**: Normalize line endings across Windows and Linux to prevent cross-platform hash invalidation.

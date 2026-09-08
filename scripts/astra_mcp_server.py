@@ -40,10 +40,11 @@ TOOLS_SCHEMA = [
         "description": "Returns a budget-fitted (<=1024 tokens) PageRank symbol map of the workspace.",
         "inputSchema": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "root_dir": {
                     "type": "string",
-                    "description": "Root directory path (defaults to current directory).",
+                    "description": "Root directory path relative to workspace root (defaults to workspace root).",
                 },
                 "budget_tokens": {
                     "type": "integer",
@@ -61,6 +62,7 @@ TOOLS_SCHEMA = [
         "description": "Finds where a symbol is defined and lists all files that reference it.",
         "inputSchema": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "symbol_name": {
                     "type": "string",
@@ -68,7 +70,7 @@ TOOLS_SCHEMA = [
                 },
                 "root_dir": {
                     "type": "string",
-                    "description": "Root directory path (defaults to current directory).",
+                    "description": "Root directory path relative to workspace root (defaults to workspace root).",
                 },
             },
             "required": ["symbol_name"],
@@ -79,10 +81,11 @@ TOOLS_SCHEMA = [
         "description": "Returns the AST skeleton of a file with function/method bodies elided.",
         "inputSchema": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Path to the source file to skeletonize.",
+                    "description": "Path to the source file to skeletonize (inside workspace).",
                 },
                 "style": {
                     "type": "string",
@@ -98,10 +101,11 @@ TOOLS_SCHEMA = [
         "description": "Extracts bounded line ranges from a file within an exact window.",
         "inputSchema": {
             "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Path to the file to inspect.",
+                    "description": "Path to the file to inspect (inside workspace).",
                 },
                 "start_line": {
                     "type": "integer",
@@ -118,44 +122,62 @@ TOOLS_SCHEMA = [
 ]
 
 
-def get_workspace_root(args: Dict[str, Any]) -> Path:
-    """Determines allowed workspace root from env, args, or current working directory."""
-    env_root = os.getenv("ASTRA_WORKSPACE_ROOT")
-    if env_root:
-        return Path(env_root).resolve()
-    arg_root = args.get("workspace_root")
-    if arg_root:
-        return Path(arg_root).resolve()
-    return Path(os.getcwd()).resolve()
+_SERVER_WORKSPACE_ROOT: Optional[Path] = None
 
 
-def validate_safe_path(target: Path, root: Path) -> Tuple[bool, str]:
-    """Validates that target path does not escape the allowed workspace boundary."""
+def init_workspace_root(root_override: Optional[Path | str] = None) -> Path:
+    """Initializes fixed workspace root for the server instance.
+    Cannot be overridden by per-call tool arguments.
+    """
+    global _SERVER_WORKSPACE_ROOT
+    if root_override:
+        _SERVER_WORKSPACE_ROOT = Path(root_override).resolve()
+    else:
+        env_root = os.getenv("ASTRA_WORKSPACE_ROOT")
+        if env_root:
+            _SERVER_WORKSPACE_ROOT = Path(env_root).resolve()
+        else:
+            _SERVER_WORKSPACE_ROOT = Path.cwd().resolve()
+    return _SERVER_WORKSPACE_ROOT
+
+
+def get_workspace_root() -> Path:
+    """Returns the immutable server-level workspace root."""
+    global _SERVER_WORKSPACE_ROOT
+    if _SERVER_WORKSPACE_ROOT is None:
+        return init_workspace_root()
+    return _SERVER_WORKSPACE_ROOT
+
+
+def validate_safe_path(target: Path | str, root: Optional[Path] = None) -> Tuple[bool, str, Optional[Path]]:
+    """Validates that target path resolves safely inside the designated server workspace boundary."""
+    server_root = (root or get_workspace_root()).resolve()
     try:
-        resolved_target = target.resolve()
-        resolved_root = root.resolve()
-        if not (resolved_target == resolved_root or resolved_root in resolved_target.parents):
-            return False, f"Access denied: path '{target}' escapes workspace root '{resolved_root}'"
-        return True, ""
+        p = Path(target)
+        resolved_target = (server_root / p).resolve() if not p.is_absolute() else p.resolve()
+        if not (resolved_target == server_root or server_root in resolved_target.parents):
+            return False, f"Access denied: path '{target}' escapes server workspace root '{server_root}'", None
+        return True, "", resolved_target
     except Exception as exc:
-        return False, f"Path resolution failed: {exc}"
+        return False, f"Path resolution failed: {exc}", None
 
 
 def handle_get_repo_map(args: Dict[str, Any]) -> Dict[str, Any]:
-    ws_root = get_workspace_root(args)
-    root_str = args.get("root_dir", str(ws_root))
+    ws_root = get_workspace_root()
+    root_str = args.get("root_dir")
+    target_path = root_str if root_str else ws_root
+
+    is_safe, err, resolved = validate_safe_path(target_path, ws_root)
+    if not is_safe or resolved is None:
+        return {"error": err}
+
+    if not resolved.is_dir():
+        return {"error": f"Directory not found: {resolved}"}
+
     budget = args.get("budget_tokens", 1024)
     focus = args.get("focus_file")
 
-    root = Path(root_str).resolve()
-    is_safe, err = validate_safe_path(root, ws_root)
-    if not is_safe:
-        return {"error": err}
-
-    if not root.is_dir():
-        return {"error": f"Directory not found: {root_str}"}
-
-    graph = RepoMapGraph(root)
+    graph = RepoMapGraph(resolved)
     graph.scan()
     repo_map = graph.render_map(budget_tokens=budget, focus_file=focus)
     return {"repo_map": repo_map}
@@ -166,17 +188,18 @@ def handle_get_symbol_subgraph(args: Dict[str, Any]) -> Dict[str, Any]:
     if not symbol:
         return {"error": "Missing required argument: symbol_name"}
 
-    ws_root = get_workspace_root(args)
-    root_str = args.get("root_dir", str(ws_root))
-    root = Path(root_str).resolve()
-    is_safe, err = validate_safe_path(root, ws_root)
-    if not is_safe:
+    ws_root = get_workspace_root()
+    root_str = args.get("root_dir")
+    target_path = root_str if root_str else ws_root
+
+    is_safe, err, resolved = validate_safe_path(target_path, ws_root)
+    if not is_safe or resolved is None:
         return {"error": err}
 
-    if not root.is_dir():
-        return {"error": f"Directory not found: {root_str}"}
+    if not resolved.is_dir():
+        return {"error": f"Directory not found: {resolved}"}
 
-    graph = RepoMapGraph(root)
+    graph = RepoMapGraph(resolved)
     graph.scan()
 
     defs = []
@@ -202,18 +225,17 @@ def handle_get_file_skeleton(args: Dict[str, Any]) -> Dict[str, Any]:
     if not file_path:
         return {"error": "Missing required argument: file_path"}
 
-    ws_root = get_workspace_root(args)
-    path = Path(file_path).resolve()
-    is_safe, err = validate_safe_path(path, ws_root)
-    if not is_safe:
+    ws_root = get_workspace_root()
+    is_safe, err, resolved = validate_safe_path(file_path, ws_root)
+    if not is_safe or resolved is None:
         return {"error": err}
 
     style = args.get("style", "ellipsis")
-    if not path.is_file():
+    if not resolved.is_file():
         return {"error": f"File not found: {file_path}"}
 
-    skeleton = generate_skeleton(path, style=style)
-    return {"file_path": str(path), "skeleton": skeleton}
+    skeleton = generate_skeleton(resolved, style=style)
+    return {"file_path": str(resolved), "skeleton": skeleton}
 
 
 def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -221,20 +243,19 @@ def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
     if not file_path:
         return {"error": "Missing required argument: file_path"}
 
-    ws_root = get_workspace_root(args)
-    path = Path(file_path).resolve()
-    is_safe, err = validate_safe_path(path, ws_root)
-    if not is_safe:
+    ws_root = get_workspace_root()
+    is_safe, err, resolved = validate_safe_path(file_path, ws_root)
+    if not is_safe or resolved is None:
         return {"error": err}
 
-    if not path.is_file():
+    if not resolved.is_file():
         return {"error": f"File not found: {file_path}"}
 
     start = max(1, args.get("start_line", 1))
     count = min(100, max(1, args.get("line_count", 50)))
 
     try:
-        lines = path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
+        lines = resolved.read_text(encoding="utf-8-sig", errors="replace").splitlines()
     except Exception as exc:
         return {"error": f"Failed to read file: {exc}"}
 
@@ -245,7 +266,7 @@ def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
     numbered = [f"{i}: {line}" for i, line in enumerate(slice_lines, start=start)]
 
     return {
-        "file_path": str(path),
+        "file_path": str(resolved),
         "start_line": start,
         "end_line": end,
         "total_lines": total_lines,
@@ -345,6 +366,11 @@ def process_mcp_message(msg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
 
 def main() -> int:
+    for i, arg in enumerate(sys.argv):
+        if arg in ("--root", "--workspace-root") and i + 1 < len(sys.argv):
+            init_workspace_root(sys.argv[i + 1])
+            break
+
     if "--test" in sys.argv:
         return 0 if run_self_test() else 1
 

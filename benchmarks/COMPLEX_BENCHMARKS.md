@@ -107,7 +107,7 @@ A continuación se presenta la tabla comparativa exhaustiva de **tokens puros (R
 | :--- | :--- | :--- | :--- | :--- |
 | **Raw Input Tokens** | 142,800 tokens | **28,600 tokens** | **-80.0%** | Evita el desbordamiento de ventana y satura menos el contexto |
 | **Cached Input Tokens** | 42,100 tokens | **26,800 tokens** | -36.3% | Prefijo invariante concentrado en $\le 1,024$ tokens estáticos |
-| **Prompt Cache Hit Rate** | 29.5% | **93.7%** | **+64.2% pts** | Máximo aprovechamiento del descuento del 50% de OpenAI |
+| **Prompt Cache Hit Rate** | 29.5% | **93.7%** | **+64.2% pts** | Aprovechamiento del descuento de caché de OpenAI (50%-90%) |
 | **Raw Output Tokens** | 1,240 tokens | **420 tokens** | **-66.1%** | Salida directa Code-First sin narración conversacional |
 | **Raw Reasoning Tokens (CoT)** | 34,800 tokens | **11,200 tokens** | **-67.8%** | **23,600 tokens de pensamiento ahorrados** al no razonar sobre ruido |
 | **Total Billed Tokens** | 178,840 tokens | **40,220 tokens** | **-77.5%** | Reducción de más de 3/4 del volumen total facturable |
@@ -144,7 +144,7 @@ Subagente 1 (Baseline)    [###################################] 142,800.0 tok
 Subagente 2 (Astra-Ultra) [#######----------------------------]  28,600.0 tok
    >> Ahorro Neto de Tokens de Entrada: -80.0%
 
-2. CACHED PROMPT TOKENS (Volumen de Descuento 50% OpenAI)
+2. CACHED PROMPT TOKENS (Volumen de Caché OpenAI)
 Subagente 1 (Baseline)    [##########-------------------------]  42,100.0 tok
 Subagente 2 (Astra-Ultra) [######################-------------]  26,800.0 tok
    >> Ratio de Acierto de Caché Astra-Ultra: 93.7%

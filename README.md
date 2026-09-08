@@ -69,7 +69,7 @@ Reference telemetry measured on complex distributed systems fixtures (Raft 35,00
 OpenAI caches prompt prefixes starting at 1,024 tokens in 128-token increments ($1024 + 128 \times k$), offering 50% to 90% discounts on cached inputs depending on the model. Astra-Ultra hashes static workspace invariants with SHA-256 Merkle trees and pads prefixes with neutral comment lines (`# --- astra-ultra:cache-align ---`) to reduce cache boundary straddling. Token counts use a standard `(len + 3) // 4` approximation; live cache hit rates depend on host client rendering.
 
 ### 2. RepoMap Graph ($\le 1,024$ tokens)
-Packs the project topology into **under 1,024 tokens** using Personalized PageRank. Python modules use full syntactic AST symbol resolution; polyglot languages (TS/JS, Go, Rust) use regex identifier heuristics—an intentional zero-dependency design choice to keep the toolkit lightweight and portable.
+Packs the project topology into **under 1,024 tokens** using Personalized PageRank. Python modules use AST-based structural symbol extraction (classes, functions, type hints, docstrings, and identifier frequency); polyglot languages (TS/JS, Go, Rust) use regex identifier heuristics—an intentional zero-dependency design choice for instant startup rather than heavy semantic compiler passes.
 
 ### 3. AST Skeletons (`...`)
 Need to inspect a module structure? `astra-ast` strips implementation bodies and replaces them with `...`, preserving class hierarchies, type hints, and docstrings for **under 50 tokens per file**.
@@ -89,7 +89,7 @@ Frontier reasoning models consume 20,000–50,000+ internal tokens per turn. Ast
 
 ## Security & Confinement
 
-Astra-Ultra's FastMCP server (`astra_mcp_server.py`) enforces strict **workspace path confinement**. Any attempt by an MCP client to read or navigate outside the designated workspace root (e.g. `../../` path traversal) is rejected with an access denial error.
+Astra-Ultra's FastMCP server (`astra_mcp_server.py`) enforces immutable **workspace path confinement**. The server workspace boundary is fixed at launch (via `--root`, `--workspace-root`, `ASTRA_WORKSPACE_ROOT`, or working directory) and cannot be overridden by tool call arguments. Any attempt by an MCP client to read or navigate outside the workspace boundary (e.g. `../../` path traversal or root spoofing) is rejected with an access denial error.
 
 ---
 
@@ -133,12 +133,12 @@ astra-ultra mcp --test
 
 ## Verification & Tests
 
-Astra-Ultra includes a deterministic test suite with **80 unit tests** and strict skill validation:
+Astra-Ultra includes a deterministic test suite with **81 unit tests** and strict skill validation:
 
 ```bash
 # Run unit tests
 python -m unittest discover -s tests
-# Ran 80 tests in 7.9s - OK
+# Ran 81 tests in 8.8s - OK
 
 # Validate agentskills.io compliance
 python quick_validate.py --skill .

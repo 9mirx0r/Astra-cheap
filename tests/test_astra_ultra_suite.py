@@ -164,29 +164,40 @@ class TestAstraMcpServer(unittest.TestCase):
             outside = Path(td) / "outside.py"
             outside.write_text("SECRET_KEY = '12345'", encoding="utf-8")
 
-            # 1. Test get_file_skeleton escapes workspace
-            res_skel = astra_mcp_server.handle_get_file_skeleton({
-                "file_path": str(outside),
-                "workspace_root": str(ws)
-            })
-            self.assertIn("error", res_skel)
-            self.assertIn("escapes workspace root", res_skel["error"])
+            # Initialize fixed server workspace root
+            astra_mcp_server.init_workspace_root(ws)
+            try:
+                # 1. Test get_file_skeleton escapes workspace
+                res_skel = astra_mcp_server.handle_get_file_skeleton({
+                    "file_path": str(outside)
+                })
+                self.assertIn("error", res_skel)
+                self.assertIn("escapes server workspace root", res_skel["error"])
 
-            # 2. Test get_bounded_slice escapes workspace
-            res_slice = astra_mcp_server.handle_get_bounded_slice({
-                "file_path": str(outside),
-                "workspace_root": str(ws)
-            })
-            self.assertIn("error", res_slice)
-            self.assertIn("escapes workspace root", res_slice["error"])
+                # 2. Test attacker attempting to spoof workspace_root in tool call payload
+                res_spoof = astra_mcp_server.handle_get_file_skeleton({
+                    "file_path": str(outside),
+                    "workspace_root": str(td)  # Malicious attempt to expand root
+                })
+                self.assertIn("error", res_spoof)
+                self.assertIn("escapes server workspace root", res_spoof["error"])
 
-            # 3. Test get_repo_map escapes workspace
-            res_map = astra_mcp_server.handle_get_repo_map({
-                "root_dir": str(td),
-                "workspace_root": str(ws)
-            })
-            self.assertIn("error", res_map)
-            self.assertIn("escapes workspace root", res_map["error"])
+                # 3. Test get_bounded_slice escapes workspace
+                res_slice = astra_mcp_server.handle_get_bounded_slice({
+                    "file_path": str(outside)
+                })
+                self.assertIn("error", res_slice)
+                self.assertIn("escapes server workspace root", res_slice["error"])
+
+                # 4. Test get_repo_map escapes workspace
+                res_map = astra_mcp_server.handle_get_repo_map({
+                    "root_dir": str(td)
+                })
+                self.assertIn("error", res_map)
+                self.assertIn("escapes server workspace root", res_map["error"])
+            finally:
+                # Reset to default
+                astra_mcp_server.init_workspace_root(None)
 
 
 if __name__ == "__main__":

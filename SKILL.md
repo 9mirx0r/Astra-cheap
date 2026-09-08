@@ -37,13 +37,13 @@ When reasoning models operate at **High, Max, or Extreme effort**:
 * **Deterministic 2-Recovery Circuit Breaker**: If 2 recovery attempts fail on the same source hash, **halt packing immediately**. Switch directly to bounded `view_file` on exact line numbers.
 
 ### 2.1 Asymmetric 1-Turn Protocol (Luna 5.6 High / o1 / o3)
-To eliminate runaway reasoning token loops on difficult tasks while preserving 100% code quality:
+To eliminate runaway reasoning token loops on difficult tasks while preserving strict code correctness:
 1. **Phase 1: Deterministic Reconnaissance (Tier-0/1)**:
    - Run AST skeletons (`astra_ast.py`), RepoMap lookups, and bounded inspection ($\le 50$ lines).
    - **Strictly Prohibited on Luna 5.6 High**: Never invoke high-effort reasoning to browse folders, grep text, or read 100+ line logs.
 2. **Phase 2: Asymmetric 1-Turn Cognitive Engine (Luna 5.6 High / o1 / o3)**:
    - Provide only the isolated 50-line window + AST topology + the specific invariant/race condition to prove.
-   - Luna 5.6 executes in **exactly 1 turn** to synthesize the fix.
+   - Luna 5.6 is prompted to synthesize the fix in a single focused turn.
 3. **Phase 3: Deterministic Test Interceptor**:
    - Run the test suite wrapped by `astra_sanitizer.py`. Verify patch with zero token noise.
 
