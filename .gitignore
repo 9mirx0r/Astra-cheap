@@ -5,3 +5,7 @@ __pycache__/
 .env.*
 auth.json
 credentials.json
+.gemini/
+*.egg-info/
+build/
+dist/

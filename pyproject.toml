@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "astra-ultra"
+version = "1.0.0"
+description = "Universal High-Precision Token Economizer and Reasoning Governor for OpenAI Codex"
+readme = "README.md"
+authors = [{ name = "Astra Ultra Team" }]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+astra-ultra = "astra_ultra:main"
+astra-repomap = "astra_repomap:main"
+astra-ast = "astra_ast:main"
+astra-mcp-server = "astra_mcp_server:main"
+astra-prefix-lock = "astra_prefix_lock:main"
+astra-sanitizer = "astra_sanitizer:main"
+astra-governor = "astra_governor:main"
+
+[tool.setuptools]
+package-dir = {"" = "scripts"}
+py-modules = [
+    "astra_ultra",
+    "astra_repomap",
+    "astra_ast",
+    "astra_mcp_server",
+    "astra_prefix_lock",
+    "astra_sanitizer",
+    "astra_governor",
+    "astra_cheap",
+    "local_handoff",
+    "usage_ledger",
+    "evidence_receipts"
+]

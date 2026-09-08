@@ -1,0 +1,26 @@
+{
+  "suite_name": "Astra-Ultra Heavyweight Operations Benchmark Suite",
+  "version": "1.0.0",
+  "workloads": [
+    {
+      "id": "raft_split_brain_recovery",
+      "name": "Distributed Raft Consensus Split-Brain & Invariant Violation",
+      "category": "distributed_systems",
+      "difficulty": "EXTREME",
+      "fixture_path": "heavy_workloads/raft_consensus/logs/raft_cluster_trace.log",
+      "total_log_lines": 35004,
+      "expected_error_line": 34503,
+      "target_model": "Luna-5.6 (High Effort) / o1 / o3-mini",
+      "description": "Isolate the exact term, candidate ID, and log index where the Raft Election Safety Invariant broke in a 35,000-line concurrent trace without dumping the log into context."
+    },
+    {
+      "id": "mvcc_aries_dirty_read",
+      "name": "High-Concurrency MVCC Delta Chain & ARIES Rollback Race",
+      "category": "storage_engines",
+      "difficulty": "HARD",
+      "codebase_path": "heavy_workloads/mvcc_storage/",
+      "target_model": "Terra (Medium Effort) / Luna-5.6 / o1",
+      "description": "Identify the missing version unlinking race condition in TransactionManager.abort causing dirty reads across concurrent checkpoints."
+    }
+  ]
+}
