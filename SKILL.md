@@ -11,9 +11,9 @@ metadata:
 
 # Astra-Ultra: Quota Optimization & Reasoning Governance for Codex
 
-Astra-Ultra eliminates quadratic context expansion ($O(N^2)$), protects subscription quotas (Plus/Team/Pro) and API TPM ceilings, and maximizes **OpenAI Prompt Caching hit rates (50% input discount)**.
+Astra-Ultra is an engineering toolkit for OpenAI Codex designed to reduce context bloat, improve reasoning focus, and optimize OpenAI Prompt Caching hit rates across reasoning models (Luna 5.6, Terra, o1, o3-mini, o3, and GPT-4o).
 
-Universal Operational Contract: **Applicable to any model (including Luna 5.6, Terra, o1, o3-mini) at any reasoning effort tier (from low to high/max/extreme).**
+Operational Scope: **Compatible with any model in Codex (including Luna 5.6, Terra, o1, o3-mini) across reasoning effort tiers (from low to high/max/extreme).**
 
 ---
 
@@ -76,7 +76,7 @@ Never dump entire files into context. Acquire codebase intelligence through surg
 - **Contract**: Inspect windows of **50 to 100 lines max** with a 2-line overlap. Unbounded `cat`, `type`, or whole-file viewing on files >40 lines is prohibited.
 
 ### 3.4 Hardware-Invariant Prefix Locking & 128-Token Cache Quantization (`scripts/astra_prefix_lock.py`)
-- **When**: Preserving static instructions to ensure 100% prompt cache hits across multi-turn sessions:
+- **When**: Preserving static instructions to maximize prompt cache hits across multi-turn sessions:
   ```bash
   python scripts/astra_prefix_lock.py build --root . --out prefix_lock.json
   python scripts/astra_prefix_lock.py verify --root . --manifest prefix_lock.json

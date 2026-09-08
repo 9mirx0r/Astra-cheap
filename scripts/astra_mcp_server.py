@@ -118,12 +118,40 @@ TOOLS_SCHEMA = [
 ]
 
 
+def get_workspace_root(args: Dict[str, Any]) -> Path:
+    """Determines allowed workspace root from env, args, or current working directory."""
+    env_root = os.getenv("ASTRA_WORKSPACE_ROOT")
+    if env_root:
+        return Path(env_root).resolve()
+    arg_root = args.get("workspace_root")
+    if arg_root:
+        return Path(arg_root).resolve()
+    return Path(os.getcwd()).resolve()
+
+
+def validate_safe_path(target: Path, root: Path) -> Tuple[bool, str]:
+    """Validates that target path does not escape the allowed workspace boundary."""
+    try:
+        resolved_target = target.resolve()
+        resolved_root = root.resolve()
+        if not (resolved_target == resolved_root or resolved_root in resolved_target.parents):
+            return False, f"Access denied: path '{target}' escapes workspace root '{resolved_root}'"
+        return True, ""
+    except Exception as exc:
+        return False, f"Path resolution failed: {exc}"
+
+
 def handle_get_repo_map(args: Dict[str, Any]) -> Dict[str, Any]:
-    root_str = args.get("root_dir", ".")
+    ws_root = get_workspace_root(args)
+    root_str = args.get("root_dir", str(ws_root))
     budget = args.get("budget_tokens", 1024)
     focus = args.get("focus_file")
 
     root = Path(root_str).resolve()
+    is_safe, err = validate_safe_path(root, ws_root)
+    if not is_safe:
+        return {"error": err}
+
     if not root.is_dir():
         return {"error": f"Directory not found: {root_str}"}
 
@@ -138,8 +166,13 @@ def handle_get_symbol_subgraph(args: Dict[str, Any]) -> Dict[str, Any]:
     if not symbol:
         return {"error": "Missing required argument: symbol_name"}
 
-    root_str = args.get("root_dir", ".")
+    ws_root = get_workspace_root(args)
+    root_str = args.get("root_dir", str(ws_root))
     root = Path(root_str).resolve()
+    is_safe, err = validate_safe_path(root, ws_root)
+    if not is_safe:
+        return {"error": err}
+
     if not root.is_dir():
         return {"error": f"Directory not found: {root_str}"}
 
@@ -169,13 +202,18 @@ def handle_get_file_skeleton(args: Dict[str, Any]) -> Dict[str, Any]:
     if not file_path:
         return {"error": "Missing required argument: file_path"}
 
+    ws_root = get_workspace_root(args)
+    path = Path(file_path).resolve()
+    is_safe, err = validate_safe_path(path, ws_root)
+    if not is_safe:
+        return {"error": err}
+
     style = args.get("style", "ellipsis")
-    path = Path(file_path)
     if not path.is_file():
         return {"error": f"File not found: {file_path}"}
 
     skeleton = generate_skeleton(path, style=style)
-    return {"file_path": file_path, "skeleton": skeleton}
+    return {"file_path": str(path), "skeleton": skeleton}
 
 
 def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -183,7 +221,12 @@ def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
     if not file_path:
         return {"error": "Missing required argument: file_path"}
 
-    path = Path(file_path)
+    ws_root = get_workspace_root(args)
+    path = Path(file_path).resolve()
+    is_safe, err = validate_safe_path(path, ws_root)
+    if not is_safe:
+        return {"error": err}
+
     if not path.is_file():
         return {"error": f"File not found: {file_path}"}
 
@@ -202,7 +245,7 @@ def handle_get_bounded_slice(args: Dict[str, Any]) -> Dict[str, Any]:
     numbered = [f"{i}: {line}" for i, line in enumerate(slice_lines, start=start)]
 
     return {
-        "file_path": file_path,
+        "file_path": str(path),
         "start_line": start,
         "end_line": end,
         "total_lines": total_lines,

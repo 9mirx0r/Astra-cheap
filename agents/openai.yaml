@@ -1,10 +1,10 @@
-﻿interface:
+interface:
   display_name: "Astra-Ultra"
   short_description: "Universal Token Economizer & Reasoning Governor for Codex (Any Model, Any Effort)"
   default_prompt: "Use $astra-ultra to solve this task with maximum token efficiency, bounded inspection, and optimized test-time compute."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false
 
 dependencies:
   tools:

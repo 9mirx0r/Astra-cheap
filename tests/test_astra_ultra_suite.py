@@ -157,6 +157,37 @@ class TestAstraMcpServer(unittest.TestCase):
     def test_self_test(self):
         self.assertTrue(astra_mcp_server.run_self_test())
 
+    def test_path_traversal_blocked(self):
+        with tempfile.TemporaryDirectory() as td:
+            ws = Path(td) / "workspace"
+            ws.mkdir()
+            outside = Path(td) / "outside.py"
+            outside.write_text("SECRET_KEY = '12345'", encoding="utf-8")
+
+            # 1. Test get_file_skeleton escapes workspace
+            res_skel = astra_mcp_server.handle_get_file_skeleton({
+                "file_path": str(outside),
+                "workspace_root": str(ws)
+            })
+            self.assertIn("error", res_skel)
+            self.assertIn("escapes workspace root", res_skel["error"])
+
+            # 2. Test get_bounded_slice escapes workspace
+            res_slice = astra_mcp_server.handle_get_bounded_slice({
+                "file_path": str(outside),
+                "workspace_root": str(ws)
+            })
+            self.assertIn("error", res_slice)
+            self.assertIn("escapes workspace root", res_slice["error"])
+
+            # 3. Test get_repo_map escapes workspace
+            res_map = astra_mcp_server.handle_get_repo_map({
+                "root_dir": str(td),
+                "workspace_root": str(ws)
+            })
+            self.assertIn("error", res_map)
+            self.assertIn("escapes workspace root", res_map["error"])
+
 
 if __name__ == "__main__":
     unittest.main()

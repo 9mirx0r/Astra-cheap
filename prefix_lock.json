@@ -1,17 +1,17 @@
 {
   "manifest_version": 1,
   "target_cache_tokens": 1024,
-  "merkle_root": "a34ac85a8ea3df5c4e0b861305511420ca9d249c54df415d96261197d92bbe34",
+  "merkle_root": "d758abf4192c586bfdcf1672332e0dd9081e0a54c297029a54e7e96245657aa5",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "cf45c47779a01f179c294d391773b6050ec386aaf1f3b41bc91faafb3363f48a",
-      "size_bytes": 6336
+      "sha256": "9971458b1760d3f498d6c561eb26339fd784f0d4bd0a54e75f55f24ecbf21312",
+      "size_bytes": 6361
     },
     {
       "path": "agents/openai.yaml",
-      "sha256": "619a7f63ca337dcb0b3cc582cba117350ab0fdc265e41c1b79cf8130ea9b9c4a",
-      "size_bytes": 495
+      "sha256": "69800b456b2fdc58245317e4af7a66f0837c537a80bf006271742c9bf43d084b",
+      "size_bytes": 493
     },
     {
       "path": "pyproject.toml",

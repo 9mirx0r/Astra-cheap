@@ -1,4 +1,4 @@
-﻿"""Astra-Ultra Heavyweight Operations Benchmark Runner for Codex.
+"""Astra-Ultra Heavyweight Operations Benchmark Runner for Codex.
 
 Executes real-world extreme operations benchmarks comparing two subagents:
   - Subagent 1: Baseline (Unoptimized Codex execution)
@@ -74,13 +74,33 @@ def run_benchmark(
 
     cli = shutil.which("codex")
     results = []
+    is_live = False
 
     # 1. Subagent 1: Baseline
     print("\n[Subagent 1: Baseline Codex Starting...]")
-    if cli:
-        pass  # live codex exec when credentials available
-    else:
-        print("  Running with verified empirical telemetry baseline...")
+    if cli and os.environ.get("ASTRA_BENCHMARK_LIVE", "0") == "1":
+        print(f"  Executing live Codex subagent via CLI: {cli}")
+        cmd = [cli, "exec", "--prompt", workload["prompt_unoptimized"]]
+        t0 = time.perf_counter()
+        try:
+            proc = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=120)
+            elapsed = time.perf_counter() - t0
+            is_live = True
+            results.append({
+                "variant": "baseline",
+                "mode": "live_codex_execution",
+                "agent_role": "Subagent 1 (Baseline Codex)",
+                "returncode": proc.returncode,
+                "elapsed_seconds": round(elapsed, 2),
+                "output_preview": proc.stdout[-300:] if proc.stdout else "",
+                "status": "completed" if proc.returncode == 0 else "failed"
+            })
+        except Exception as exc:
+            print(f"  Live execution failed ({exc}); falling back to calibrated fixture profile.")
+            is_live = False
+
+    if not is_live:
+        print("  Running with calibrated fixture profile from workload logs...")
         if workload_id == "raft_split_brain_recovery":
             base_in = 142800
             base_cached = 42100
@@ -97,6 +117,8 @@ def run_benchmark(
         base_cost = calculate_cost(model, base_in, base_cached, base_out + base_reasoning)
         results.append({
             "variant": "baseline",
+            "mode": "calibrated_fixture_profile",
+            "note": "Reference baseline profile derived from raw unmasked trace volume.",
             "agent_role": "Subagent 1 (Baseline Codex)",
             "returncode": 0,
             "elapsed_seconds": base_time,
@@ -113,10 +135,30 @@ def run_benchmark(
 
     # 2. Subagent 2: Astra-Ultra
     print("\n[Subagent 2: Astra-Ultra Optimized Codex Starting...]")
-    if cli:
-        pass  # live codex exec with $astra-ultra
-    else:
-        print("  Running with Astra-Ultra optimization engine...")
+    ultra_live = False
+    if cli and os.environ.get("ASTRA_BENCHMARK_LIVE", "0") == "1":
+        print(f"  Executing live Astra-Ultra subagent via CLI: {cli}")
+        cmd = [cli, "exec", "--prompt", f"Use $astra-ultra. {workload['prompt_optimized']}"]
+        t0 = time.perf_counter()
+        try:
+            proc = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=120)
+            elapsed = time.perf_counter() - t0
+            ultra_live = True
+            results.append({
+                "variant": "astra-ultra",
+                "mode": "live_codex_execution",
+                "agent_role": "Subagent 2 (Astra-Ultra Guided)",
+                "returncode": proc.returncode,
+                "elapsed_seconds": round(elapsed, 2),
+                "output_preview": proc.stdout[-300:] if proc.stdout else "",
+                "status": "completed" if proc.returncode == 0 else "failed"
+            })
+        except Exception as exc:
+            print(f"  Live execution failed ({exc}); falling back to calibrated fixture profile.")
+            ultra_live = False
+
+    if not ultra_live:
+        print("  Running with calibrated Astra-Ultra fixture profile...")
         if workload_id == "raft_split_brain_recovery":
             ultra_in = 28600
             ultra_cached = 26800
@@ -133,6 +175,8 @@ def run_benchmark(
         ultra_cost = calculate_cost(model, ultra_in, ultra_cached, ultra_out + ultra_reasoning)
         results.append({
             "variant": "astra-ultra",
+            "mode": "calibrated_fixture_profile",
+            "note": "Reference Astra-Ultra profile with AST skeletonization and noise masking.",
             "agent_role": "Subagent 2 (Astra-Ultra Guided)",
             "returncode": 0,
             "elapsed_seconds": ultra_time,

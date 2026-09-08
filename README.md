@@ -9,10 +9,10 @@ Cut context bloat by up to **80%** without sacrificing a single line of code qua
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square)](https://www.python.org/)
-[![Tests: 80/80 Passing](https://img.shields.io/badge/Tests-80%2F80%20Passing-emerald.svg?style=flat-square)](#tests)
+[![Tests: 81/81 Passing](https://img.shields.io/badge/Tests-81%2F81%20Passing-emerald.svg?style=flat-square)](#tests)
 [![agentskills.io](https://img.shields.io/badge/Skill-agentskills.io%20Validated-blue.svg?style=flat-square)](#skill-standard)
-[![OpenAI Cache Hit](https://img.shields.io/badge/OpenAI%20Cache-93.7%25%20Locked-purple.svg?style=flat-square)](#1-prefix-lock--128-token-cache-quantization)
-[![Universal Models](https://img.shields.io/badge/Models-Luna%205.6%20%7C%20Terra%20%7C%20o1%20%7C%20o3--mini-orange.svg?style=flat-square)](#universal-model-support)
+[![OpenAI Cache Aligned](https://img.shields.io/badge/OpenAI%20Cache-Aligned%20128--tok-purple.svg?style=flat-square)](#1-prefix-lock--128-token-cache-quantization)
+[![Models](https://img.shields.io/badge/Models-Luna%205.6%20%7C%20Terra%20%7C%20o1%20%7C%20o3--mini-orange.svg?style=flat-square)](#universal-model-support)
 
 </div>
 
@@ -20,19 +20,19 @@ Cut context bloat by up to **80%** without sacrificing a single line of code qua
 
 ## Why Astra-Ultra?
 
-When running autonomous coding agents on OpenAI Codex, your subscription quota and API tokens silently evaporate because of three issues:
+When running autonomous coding agents on OpenAI Codex, subscription quotas and API tokens often evaporate because of three issues:
 
-1. **Terminal dumps:** Running `pytest` or `cargo test` dumps 5,000 lines of passing logs into context.
-2. **Whole-file dumping:** Inspecting a 1,500-line file just to check a function signature.
-3. **Reasoning amnesia & runaway loops:** Models like **Luna 5.6 (High/Max)** burn 30,000+ chain-of-thought tokens per turn just navigating folders and reading raw logs.
+1. **Terminal dumps:** Running test suites (`pytest`, `cargo test`) dumps thousands of lines of noisy logs into context.
+2. **Whole-file dumping:** Inspecting a 1,500-line file just to check a method signature or interface.
+3. **Reasoning amnesia & repetitive loops:** High-effort reasoning models (like **Luna 5.6 High** or **o1/o3**) consume thousands of internal chain-of-thought tokens per turn just navigating folders and reading raw logs.
 
-**Astra-Ultra fixes the pipeline.** It gives Codex surgical tools, locks prompt caching, and enforces an asymmetric reasoning flow so that expensive models are only used when intense cognitive compute is actually needed.
+**Astra-Ultra is a context hygiene and reasoning governance toolkit.** It provides surgical tools, aligns prompt caching prefixes, and enforces an asymmetric reasoning flow so that expensive models are only invoked for causal problem solving, not file browsing.
 
 ---
 
-## Real-World Benchmarks
+## Calibrated Workload Profiles
 
-Measured against real, heavy engineering tasks (Raft distributed consensus split-brain with a 35,000-line cluster trace, and concurrent MVCC storage engine recovery):
+Reference telemetry measured on complex distributed systems fixtures (Raft 35,000-line cluster trace and concurrent MVCC rollback race condition):
 
 | Workload | Model & Effort | Baseline Tokens | Astra-Ultra Tokens | Savings | Speedup | Result |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -40,7 +40,7 @@ Measured against real, heavy engineering tasks (Raft distributed consensus split
 | **MVCC / ARIES Rollback Race Condition** | **Terra (Medium)** | 116,198 | 22,450 | **-80.7%** | **3.3x** | PASS |
 | **Vector Index Rebalance** | **o3-mini (High)** | 98,400 | 21,300 | **-78.4%** | **2.9x** | PASS |
 
-> Complete reproduction runbooks and telemetry ledgers are documented in [`benchmarks/COMPLEX_BENCHMARKS.md`](benchmarks/COMPLEX_BENCHMARKS.md).
+> **Note on Benchmarks:** Figures above reflect calibrated reference profiles on synthetic fixtures. Actual live token consumption depends on host rendering, tool schemas, and session depth. For live CLI benchmarking with host credentials, run with `ASTRA_BENCHMARK_LIVE=1`. See [`benchmarks/COMPLEX_BENCHMARKS.md`](benchmarks/COMPLEX_BENCHMARKS.md).
 
 ---
 
@@ -48,11 +48,11 @@ Measured against real, heavy engineering tasks (Raft distributed consensus split
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│  1. PREFIX LOCK & 128-TOKEN QUANTIZATION (>=1024 tok, 50% discount)    │
-│     Locks system headers at byte 0; aligns to exact 128-token blocks.  │
+│  1. PREFIX LOCK & 128-TOKEN QUANTIZATION (>=1024 tok, cache alignment) │
+│     Locks static headers at byte 0; pads to 128-token block multiples. │
 ├────────────────────────────────────────────────────────────────────────┤
-│  2. AST PAGERANK REPOMAP (<=1024 tokens)                               │
-│     Compact symbol dependency tree fitted to OpenAI's cache threshold. │
+│  2. REPOMAP GRAPH (<=1024 tokens)                                      │
+│     AST PageRank for Python; regex heuristics for polyglot files.      │
 ├────────────────────────────────────────────────────────────────────────┤
 │  3. AST SKELETONS & SURGICAL WINDOWS                                   │
 │     Elides function bodies with '...' (<50 tok/file); max 50-line view.│
@@ -66,24 +66,30 @@ Measured against real, heavy engineering tasks (Raft distributed consensus split
 ```
 
 ### 1. Prefix Lock & 128-Token Cache Quantization
-OpenAI caches prompts with $\ge 1,024$ tokens in 128-token increments ($1024 + 128 \times k$). Astra-Ultra freezes static invariants using SHA-256 Merkle validation and pads prefixes with neutral comment lines (`# --- astra-ultra:cache-align ---`). Dynamic turns never straddle cache boundaries, guaranteeing **>90% prompt cache hit rates**.
+OpenAI caches prompt prefixes starting at 1,024 tokens in 128-token increments ($1024 + 128 \times k$), offering 50% to 90% discounts on cached inputs depending on the model. Astra-Ultra hashes static workspace invariants with SHA-256 Merkle trees and pads prefixes with neutral comment lines (`# --- astra-ultra:cache-align ---`) to reduce cache boundary straddling. Token counts use a standard `(len + 3) // 4` approximation; live cache hit rates depend on host client rendering.
 
-### 2. Personalized PageRank RepoMap ($\le 1,024$ tokens)
-Instead of stuffing directory trees or hundreds of files into context, Astra-Ultra runs Personalized PageRank over code definitions and caller graphs, packing the entire project topology into **under 1,024 tokens**.
+### 2. RepoMap Graph ($\le 1,024$ tokens)
+Packs the project topology into **under 1,024 tokens** using Personalized PageRank. Python modules use full syntactic AST symbol resolution; polyglot languages (TS/JS, Go, Rust) use regex identifier heuristics—an intentional zero-dependency design choice to keep the toolkit lightweight and portable.
 
 ### 3. AST Skeletons (`...`)
-Need to inspect an API or module? `astra-ast` strips internal function bodies and replaces them with `...`, preserving full class topologies, type hints, and docstrings for **under 50 tokens per file**.
+Need to inspect a module structure? `astra-ast` strips implementation bodies and replaces them with `...`, preserving class hierarchies, type hints, and docstrings for **under 50 tokens per file**.
 
 ### 4. Noise Sanitization & Observation Masking
 - Blocks accidental `cat` or `type` dumps on files over 40 lines.
-- Wraps `pytest`, `cargo`, and `npm test` runs, redirecting raw logs to `.local/logs/` and surfacing only the failure summary with the last 25 lines.
-- Masks historical command output once a patch is verified, preventing models from re-reasoning over stale text.
+- Intercepts `pytest`, `cargo`, and `npm test` runs, logging full traces to `.local/logs/` while displaying only the failure summary and last 25 lines.
+- Hashes historical command output once a patch is verified to prevent models from re-reasoning over stale text.
 
 ### 5. Asymmetric 1-Turn Protocol for Luna 5.6 High
-Frontier reasoning models consume 20,000–50,000+ tokens per turn. Having Luna 5.6 High browse folders and read logs burns quotas in 20 minutes. Astra-Ultra decouples discovery from reasoning:
-- **Phase 1 (Recon):** Low-cost tools isolate the issue to $\le 50$ lines of code.
-- **Phase 2 (Synthesis):** Luna 5.6 High is invoked for **exactly 1 turn** on the isolated causal core to emit the patch diff.
-- **Phase 3 (Verification):** Test interceptor checks the fix with zero token noise.
+Frontier reasoning models consume 20,000–50,000+ internal tokens per turn. Astra-Ultra decouples discovery from synthesis:
+- **Phase 1 (Recon):** Low-cost deterministic tools isolate the causal issue to $\le 50$ lines of code.
+- **Phase 2 (Synthesis):** Luna 5.6 High is invoked for **1 surgical turn** on the isolated problem statement to emit the patch diff.
+- **Phase 3 (Verification):** Test interceptor verifies the patch with zero token noise.
+
+---
+
+## Security & Confinement
+
+Astra-Ultra's FastMCP server (`astra_mcp_server.py`) enforces strict **workspace path confinement**. Any attempt by an MCP client to read or navigate outside the designated workspace root (e.g. `../../` path traversal) is rejected with an access denial error.
 
 ---
 
