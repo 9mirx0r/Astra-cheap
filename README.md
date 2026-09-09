@@ -4,12 +4,13 @@
 
 # Astra-Ultra
 
-**Universal token economizer & reasoning governor for OpenAI Codex.**  
-Cut context bloat by up to **80%** without sacrificing a single line of code quality.
+**Bounded context and verification runtime for OpenAI Codex.**  
+Reduce repeated repository context while keeping correctness checks outside the
+agent and making the trade-offs visible.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square)](https://www.python.org/)
-[![Tests: 101/101 Passing](https://img.shields.io/badge/Tests-101%2F101%20Passing-emerald.svg?style=flat-square)](#tests)
+[![Tests: 106/106 Passing](https://img.shields.io/badge/Tests-106%2F106%20Passing-emerald.svg?style=flat-square)](#tests)
 [![agentskills.io](https://img.shields.io/badge/Skill-agentskills.io%20Validated-blue.svg?style=flat-square)](#skill-standard)
 [![OpenAI Cache Aligned](https://img.shields.io/badge/OpenAI%20Cache-Aligned%20128--tok-purple.svg?style=flat-square)](#1-prefix-lock--128-token-cache-quantization)
 [![Models](https://img.shields.io/badge/Models-Luna%205.6%20%7C%20Terra%20%7C%20o1%20%7C%20o3--mini-orange.svg?style=flat-square)](#universal-model-support)
@@ -26,7 +27,10 @@ When running autonomous coding agents on OpenAI Codex, subscription quotas and A
 2. **Whole-file dumping:** Inspecting a 1,500-line file just to check a method signature or interface.
 3. **Reasoning amnesia & repetitive loops:** High-effort reasoning models (like **Luna 5.6 High** or **o1/o3**) consume thousands of internal chain-of-thought tokens per turn just navigating folders and reading raw logs.
 
-**Astra-Ultra is a context hygiene and reasoning governance toolkit.** It provides surgical tools, aligns prompt caching prefixes, and enforces an asymmetric reasoning flow so that expensive models are only invoked for causal problem solving, not file browsing.
+**Astra-Ultra is a context hygiene and reasoning governance toolkit.** It
+provides bounded source views, separates provider execution from host-side
+verification, and records enough telemetry to inspect the cost/latency trade-off
+instead of hiding it behind a single score.
 
 ---
 
@@ -60,9 +64,9 @@ All three arms were functionally accepted.
 \*Total tokens means provider-reported input plus output. Reasoning tokens are
 included in output and are not added a second time.
 
-This run establishes Astra-Ultra as the current overall choice for the
-project's objective: preserve correctness while minimizing token and monetary
-cost. Lattice has a narrower latency win on this task.
+On this task, Astra-Ultra had the lowest measured token and monetary cost while
+preserving the same acceptance result. Lattice had the lower latency. This is a
+task-level result, not a general leaderboard.
 
 - Astra-Ultra used **95.79% less input** and cost **54.91% less than Baseline**.
 - Astra-Ultra also used **88.93% fewer total tokens** and cost **30.29% less
@@ -111,11 +115,11 @@ small.
 
 ## How Astra-Ultra Compares to Other Approaches
 
-The live run supports this evidence-backed conclusion: **Astra-Ultra is the
-current overall winner for efficient, verifiable coding work**. It is much more
-token- and cost-efficient than both the unoptimized baseline and Lattice, while
-the current worker is slower than Lattice on this task. Lattice is not a cheaper
-alternative here; Astra-Ultra cost US$0.12367 versus Lattice's US$0.17742.
+The live run supports a narrower conclusion: **Astra-Ultra had the best measured
+efficiency profile in this trial**. It used fewer tokens and cost less than the
+unoptimized baseline and Lattice, while the current worker was slower than
+Lattice. Lattice is not a cheaper alternative in this run: Astra-Ultra cost
+US$0.12367 versus Lattice's US$0.17742.
 
 The practical ranking from the latest evidence is:
 
@@ -238,12 +242,12 @@ For the verifiable host runtime, see [`docs/ASTRA_RUNTIME.md`](docs/ASTRA_RUNTIM
 
 ## Verification & Tests
 
-Astra-Ultra includes a deterministic test suite with **101 unit tests** and strict skill validation:
+Astra-Ultra includes a deterministic test suite with **106 unit tests** and strict skill validation:
 
 ```bash
 # Run unit tests
 python -m unittest discover -s tests
-# Ran 101 tests - OK
+# Ran 106 tests - OK
 
 # Validate agentskills.io compliance
 python quick_validate.py --skill .

@@ -73,7 +73,8 @@ subset of output tokens and are shown separately for diagnosis.
 
 ### Interpretation and current ranking
 
-- **Astra-Ultra is the current overall winner for this project's objective.**
+- **Astra-Ultra had the best measured efficiency profile in this trial.** This
+  is provisional evidence from one task, not a general leaderboard.
   It preserved acceptance while using 95.79% less input than Baseline, 88.93%
   fewer total tokens than Lattice, and the lowest measured cost.
 - **Lattice won the narrower latency category.** It finished 3.30× faster than
