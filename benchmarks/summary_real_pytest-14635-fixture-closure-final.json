@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "Fixture closure changes when common parent directories are collected repeatedly",
+    "repository": "https://github.com/pytest-dev/pytest.git",
+    "issue": "https://github.com/pytest-dev/pytest/issues/14635",
+    "base_sha": "eb79044cea1c2c7b6e58ebcce17c55da871fef6c",
+    "model": "gpt-5.6-luna",
+    "effort": "max",
+    "execution_mode": "parallel",
+    "artifact_dir": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure"
+  },
+  "metrics": {
+    "baseline": {
+      "input": 4110495,
+      "cached": 3973376,
+      "fresh": 137119,
+      "output": 33598,
+      "reasoning": 21270,
+      "cost": 0.27426,
+      "elapsed": 807.94,
+      "tests_elapsed": 5.11,
+      "acceptance_elapsed": 10.57,
+      "events": 146,
+      "turns": 1,
+      "tool_calls": 124,
+      "files": 3,
+      "added": 135,
+      "deleted": 0,
+      "page_faults": null,
+      "recovery_attempts": null,
+      "loaded_pages": null,
+      "initial_context_tokens": null,
+      "worker_turns": null,
+      "protocol_repairs": null
+    },
+    "astra-ultra": {
+      "input": 173161,
+      "cached": 26112,
+      "fresh": 147049,
+      "output": 78113,
+      "reasoning": 75785,
+      "cost": 0.12367,
+      "elapsed": 1446.05,
+      "tests_elapsed": 2.81,
+      "acceptance_elapsed": 12.88,
+      "events": 19,
+      "turns": 4,
+      "tool_calls": 0,
+      "files": 2,
+      "added": 110,
+      "deleted": 0,
+      "page_faults": 2,
+      "recovery_attempts": 1,
+      "loaded_pages": 5,
+      "initial_context_tokens": 1242,
+      "worker_turns": 4,
+      "protocol_repairs": null
+    },
+    "lattice": {
+      "input": 2254889,
+      "cached": 2089216,
+      "fresh": 165673,
+      "output": 15324,
+      "reasoning": 9588,
+      "cost": 0.17742,
+      "elapsed": 437.5,
+      "tests_elapsed": 5.1,
+      "acceptance_elapsed": 10.59,
+      "events": 52,
+      "turns": 5,
+      "tool_calls": null,
+      "files": 2,
+      "added": 144,
+      "deleted": 0,
+      "page_faults": 4,
+      "recovery_attempts": null,
+      "loaded_pages": 6,
+      "initial_context_tokens": 39997,
+      "worker_turns": 5,
+      "protocol_repairs": 0
+    }
+  },
+  "comparisons": {
+    "astra-ultra": {
+      "input_token_change_pct": -95.79,
+      "cached_input_change_pct": -99.34,
+      "output_token_change_pct": 132.49,
+      "reasoning_token_change_pct": 256.3,
+      "latency_change_pct": 78.98,
+      "test_latency_change_pct": -45.01,
+      "cost_change_pct": -54.91,
+      "tool_call_change_pct": -100.0,
+      "speedup_factor": 0.559
+    },
+    "lattice": {
+      "input_token_change_pct": -45.14,
+      "cached_input_change_pct": -47.42,
+      "output_token_change_pct": -54.39,
+      "reasoning_token_change_pct": -54.92,
+      "latency_change_pct": -45.85,
+      "test_latency_change_pct": -0.2,
+      "cost_change_pct": -35.31,
+      "tool_call_change_pct": null,
+      "speedup_factor": 1.847
+    }
+  },
+  "results": {
+    "baseline": {
+      "status": "accepted",
+      "internal_status": null,
+      "agent_success": true,
+      "accepted": true,
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "tests_green": true,
+      "acceptance_green": true,
+      "test_count": 2,
+      "changed_files": [
+        "changelog/14635.bugfix.rst",
+        "src/_pytest/main.py",
+        "testing/test_conftest.py"
+      ],
+      "failure_reasons": []
+    },
+    "astra-ultra": {
+      "status": "accepted",
+      "internal_status": null,
+      "agent_success": true,
+      "accepted": true,
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "tests_green": true,
+      "acceptance_green": true,
+      "test_count": 2,
+      "changed_files": [
+        "src/_pytest/main.py",
+        "testing/test_conftest.py"
+      ],
+      "failure_reasons": []
+    },
+    "lattice": {
+      "status": "accepted",
+      "internal_status": "passed",
+      "agent_success": true,
+      "accepted": true,
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "tests_green": true,
+      "acceptance_green": true,
+      "test_count": 2,
+      "changed_files": [
+        "src/_pytest/main.py",
+        "testing/test_conftest.py"
+      ],
+      "failure_reasons": []
+    }
+  },
+  "attempts": [
+    {
+      "artifact": "1788902266549912900-pytest-14635-fixture-closure",
+      "path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788902266549912900-pytest-14635-fixture-closure\\real_task_results.json",
+      "official": false,
+      "status": "failed",
+      "internal_status": "failed",
+      "accepted": false,
+      "agent_success": false,
+      "elapsed_seconds": 343.44,
+      "input_tokens": 678864,
+      "page_faults": 3,
+      "worker_turns": 4,
+      "failure_reasons": [
+        "agent_failed",
+        "external_acceptance_failed",
+        "no_tests_changed"
+      ]
+    },
+    {
+      "artifact": "1788905085063758800-pytest-14635-fixture-closure",
+      "path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788905085063758800-pytest-14635-fixture-closure\\real_task_results.json",
+      "official": false,
+      "status": "failed",
+      "internal_status": "failed",
+      "accepted": false,
+      "agent_success": false,
+      "elapsed_seconds": 423.48,
+      "input_tokens": 932566,
+      "page_faults": 2,
+      "worker_turns": 4,
+      "failure_reasons": [
+        "agent_failed",
+        "targeted_suite_failed"
+      ]
+    },
+    {
+      "artifact": "1788907867209051800-pytest-14635-fixture-closure",
+      "path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788907867209051800-pytest-14635-fixture-closure\\real_task_results.json",
+      "official": false,
+      "status": "failed",
+      "internal_status": "failed",
+      "accepted": false,
+      "agent_success": false,
+      "elapsed_seconds": 504.65,
+      "input_tokens": 1940956,
+      "page_faults": 7,
+      "worker_turns": 8,
+      "failure_reasons": [
+        "agent_failed",
+        "targeted_suite_failed"
+      ]
+    },
+    {
+      "artifact": "1788910170419117700-pytest-14635-fixture-closure",
+      "path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788910170419117700-pytest-14635-fixture-closure\\real_task_results.json",
+      "official": false,
+      "status": "accepted",
+      "internal_status": "passed",
+      "accepted": true,
+      "agent_success": true,
+      "elapsed_seconds": 493.82,
+      "input_tokens": 954302,
+      "page_faults": 2,
+      "worker_turns": 3,
+      "failure_reasons": []
+    },
+    {
+      "artifact": "1788912985871866300-pytest-14635-fixture-closure",
+      "path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\real_task_results.json",
+      "official": true,
+      "status": "accepted",
+      "internal_status": "passed",
+      "accepted": true,
+      "agent_success": true,
+      "elapsed_seconds": 437.5,
+      "input_tokens": 2254889,
+      "page_faults": 4,
+      "worker_turns": 5,
+      "failure_reasons": []
+    }
+  ]
+}

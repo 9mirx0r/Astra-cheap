@@ -79,11 +79,15 @@ def generate_ascii_report(data: Dict[str, Any]) -> str:
         render_ascii_bar("Astra-Ultra", ultra_cached, max_cached, unit="tok"),
         f"   >> Astra-Ultra Prompt Cache Hit Ratio: {cache_rate_ultra:.1f}%",
         "",
-        "3. REASONING & OUTPUT TOKENS (High Test-Time Compute Preservation)",
+        "3. OUTPUT TOKENS (Reasoning tokens are included in this counter)",
+        render_ascii_bar("Baseline", base_out, max_out, unit="tok"),
+        render_ascii_bar("Astra-Ultra", ultra_out, max_out, unit="tok"),
+        "",
+        "4. REASONING TOKENS (Subset; not additive for billing)",
         render_ascii_bar("Baseline", base_reasoning, max_reasoning, unit="tok"),
         render_ascii_bar("Astra-Ultra", ultra_reasoning, max_reasoning, unit="tok"),
         "",
-        "4. WALL-CLOCK EXECUTION TIME",
+        "5. WALL-CLOCK EXECUTION TIME",
         render_ascii_bar("Baseline", base.get("elapsed_seconds", 0), max(base.get("elapsed_seconds", 0), ultra.get("elapsed_seconds", 0), 1), unit="sec"),
         render_ascii_bar("Astra-Ultra", ultra.get("elapsed_seconds", 0), max(base.get("elapsed_seconds", 0), ultra.get("elapsed_seconds", 0), 1), unit="sec"),
         "",
@@ -121,6 +125,7 @@ def generate_html_dashboard(data: Dict[str, Any], output_html: Path) -> None:
     is_live = any(r.get("mode") == "live_codex_execution" for r in results)
     mode_text = "Live Codex CLI Execution" if is_live else "Calibrated Workload Profile"
 
+    base_denominator = max(base_in, 1)
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,7 +169,7 @@ def generate_html_dashboard(data: Dict[str, Any], output_html: Path) -> None:
       </div>
       <div class="card" style="border-left-color: #a855f7;">
         <div class="card-title">Speedup Factor</div>
-        <div class="card-val">{round(base_time / ultra_time, 1)}x</div>
+        <div class="card-val">{round(base_time / ultra_time, 1) if ultra_time else 0}x</div>
         <div class="card-sub">{base_time}s &rarr; {ultra_time}s</div>
       </div>
     </div>
@@ -177,7 +182,7 @@ def generate_html_dashboard(data: Dict[str, Any], output_html: Path) -> None:
       </div>
       <div class="bar-group">
         <div class="bar-label"><span>Astra-Ultra</span> <span>{ultra_in:,} tokens</span></div>
-        <div class="bar-track"><div class="bar-fill-ultra" style="width: {round(ultra_in / base_in * 100, 1)}%;"></div></div>
+        <div class="bar-track"><div class="bar-fill-ultra" style="width: {round(ultra_in / base_denominator * 100, 1)}%;"></div></div>
       </div>
     </div>
   </div>

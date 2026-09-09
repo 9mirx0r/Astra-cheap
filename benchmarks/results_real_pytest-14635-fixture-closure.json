@@ -1,0 +1,1089 @@
+{
+  "schema": 1,
+  "benchmark": "real_github_task",
+  "task_slug": "pytest-14635-fixture-closure",
+  "repository": "https://github.com/pytest-dev/pytest.git",
+  "issue": "https://github.com/pytest-dev/pytest/issues/14635",
+  "issue_title": "Fixture closure changes when common parent directories are collected repeatedly",
+  "base_sha": "eb79044cea1c2c7b6e58ebcce17c55da871fef6c",
+  "model": "gpt-5.6-luna",
+  "effort": "max",
+  "astra_mode": "runtime",
+  "order": "baseline-first",
+  "shared_evidence_packet": true,
+  "execution_mode": "parallel",
+  "agent_phase_elapsed_seconds": 1446.06,
+  "verification_phase_elapsed_seconds": 16.51,
+  "artifact_dir": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure",
+  "worktrees": {
+    "baseline": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\baseline",
+    "astra-ultra": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\astra-ultra",
+    "lattice": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\lattice"
+  },
+  "results": [
+    {
+      "variant": "baseline",
+      "returncode": 0,
+      "agent_success": true,
+      "elapsed_seconds": 807.94,
+      "usage": {
+        "input_tokens": 4110495,
+        "cached_input_tokens": 3973376,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 33598,
+        "reasoning_output_tokens": 21270
+      },
+      "usage_complete": true,
+      "estimated_cost_usd": 0.27426,
+      "observed": {
+        "event_count": 146,
+        "turn_count": 1,
+        "tool_call_count": 124,
+        "observed_model": null,
+        "observed_effort": null
+      },
+      "response_preview": "{\"summary\":\"Implemented path-based reconciliation of re-collected Directory children, added a three-order regression test, and documented the fix.\",\"changed_files\":[\"src/_pytest/main.py\",\"testing/test_conftest.py\",\"changelog/14635.bugfix.rst\"],\"tests_added\":[\"test_fixture_closure_order_independence_with_parametrize\"],\"risks\":[\"Pytest tests could not run because the available runtime lacks pluggy; compileall and diff checks passed.\"]}",
+      "worktree": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\baseline",
+      "events_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.events.jsonl",
+      "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.stderr.txt",
+      "answer_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.answer.json",
+      "prompt_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.prompt.txt",
+      "command": [
+        "C:\\Users\\emir\\AppData\\Local\\OpenAI\\Codex\\bin\\8e5b6932251c2c1c\\codex.EXE",
+        "exec",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--json",
+        "--color",
+        "never",
+        "--sandbox",
+        "workspace-write",
+        "--cd",
+        "C:\\bt\\pytest-14635-fixture-clo-985871967900\\baseline",
+        "--output-schema",
+        "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\agent_output.schema.json",
+        "--output-last-message",
+        "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.answer.json",
+        "--model",
+        "gpt-5.6-luna",
+        "-c",
+        "model_reasoning_effort=max"
+      ],
+      "status": "accepted",
+      "tests": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "-c",
+          "import os,sys,tempfile,pathlib;b=pathlib.Path(tempfile.mkdtemp(prefix='pytest-benchmark-bootstrap-'));pathlib.Path(b,'sitecustomize.py').write_text(\"import sys,types\"+chr(10)+\"m=types.ModuleType('_pytest._version')\"+chr(10)+\"m.version='9.1.0.dev0'\"+chr(10)+\"m.version_tuple=(9,1,0,'dev0')\"+chr(10)+\"sys.modules['_pytest._version']=m\"+chr(10)+\"import _pytest\"+chr(10)+\"_pytest._version=m\"+chr(10),encoding='utf-8');s=os.path.abspath('src');o=os.environ.get('PYTHONPATH');os.environ['PYTHONPATH']=os.pathsep.join([str(b),s]+([o] if o else []));sys.path[:0]=[str(b),s];import sitecustomize,pytest;raise SystemExit(pytest.main(['testing/test_conftest.py','-q','--disable-warnings','--maxfail=5','-k','test_conftest_fixture_from_ancestor_above_rootdir or fixture_closure_order_independence_with_parametrize']))"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 5.11,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.tests.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.tests.stderr.txt",
+        "output_preview": "..                                                                       [100%]\n2 passed, 56 deselected in 0.72s\n\n"
+      },
+      "external_acceptance": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\acceptance_harness.py"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 10.57,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.acceptance.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\baseline.acceptance.stderr.txt",
+        "output_preview": "{\"accepted\": true, \"runs\": [{\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.03s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/tts/test_init.py::test_setup_no_access[error_value]\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\n\\n3 tests collected in 0.02s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/test_config_entries.py::test_config\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.02s\\n\"}]}\n\n"
+      },
+      "diff": {
+        "changed_files": [
+          "changelog/14635.bugfix.rst",
+          "src/_pytest/main.py",
+          "testing/test_conftest.py"
+        ],
+        "changed_file_count": 3,
+        "test_files_changed": [
+          "testing/test_conftest.py"
+        ],
+        "lines_added": 135,
+        "lines_deleted": 0,
+        "diff_check_passed": true,
+        "diff_check_output": "warning: in the working copy of 'src/_pytest/main.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'testing/test_conftest.py', LF will be replaced by CRLF the next time Git touches it\n"
+      },
+      "criteria": {
+        "collection_identity_surface": true,
+        "fixture_regression_surface": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "codex_completed": true,
+        "no_whitespace_errors": true
+      },
+      "completion_criteria": {
+        "codex_completed": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "no_whitespace_errors": true
+      },
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "failure_reasons": [],
+      "accepted": true
+    },
+    {
+      "variant": "astra-ultra",
+      "returncode": 0,
+      "agent_success": true,
+      "status": "accepted",
+      "runtime_status": "verified",
+      "elapsed_seconds": 1446.05,
+      "usage": {
+        "input_tokens": 173161,
+        "cached_input_tokens": 26112,
+        "cache_write_input_tokens": null,
+        "output_tokens": 78113,
+        "reasoning_output_tokens": 75785
+      },
+      "usage_complete": true,
+      "estimated_cost_usd": 0.12367,
+      "observed": {
+        "event_count": 19,
+        "turn_count": 4,
+        "tool_call_count": 0,
+        "observed_model": "gpt-5.6-luna",
+        "observed_effort": "max"
+      },
+      "response_preview": "Adds canonical reuse of directory collectors during repeated collection while preserving fresh file collection, plus the requested parametrized fixture-closure regression test.",
+      "worktree": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\astra-ultra",
+      "evaluation_worktree": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\astra-ultra",
+      "events_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.runtime\\turn-4.events.jsonl",
+      "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.runtime\\turn-4.stderr.txt",
+      "answer_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.runtime\\turn-4.answer.json",
+      "prompt_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.runtime\\turn-4.prompt.txt",
+      "runtime_result_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.runtime-result.json",
+      "runtime_telemetry": {
+        "started_at": 87696.504323,
+        "finished_at": 89142.5512493,
+        "elapsed_seconds": 1446.0469,
+        "turns": 4,
+        "page_faults": 2,
+        "recovery_attempts": 1,
+        "input_tokens": 173161,
+        "cached_input_tokens": 26112,
+        "output_tokens": 78113,
+        "reasoning_output_tokens": 75785,
+        "tool_call_count": 0,
+        "stages_ms": {
+          "index": 5362.45,
+          "context": 28.91,
+          "worker_turn_1": 20628.52,
+          "context_fault": 32.84,
+          "worker_turn_2": 835121.4,
+          "worker_turn_3": 19290.05,
+          "worker_turn_4": 555742.16,
+          "verification": 9699.5
+        },
+        "events": [
+          {
+            "event": "created"
+          },
+          {
+            "event": "indexed",
+            "file_count": 568
+          },
+          {
+            "event": "context_ready",
+            "page_count": 5,
+            "estimated_tokens": 1242
+          },
+          {
+            "event": "working",
+            "turn": 1,
+            "estimated_prompt_tokens": 3594
+          },
+          {
+            "event": "worker_response",
+            "turn": 1,
+            "kind": "context_request",
+            "usage": {
+              "input_tokens": 18771,
+              "cached_input_tokens": 0,
+              "output_tokens": 794,
+              "reasoning_output_tokens": 608,
+              "elapsed_ms": 20578,
+              "event_count": 4,
+              "tool_call_count": 0
+            },
+            "page_ids": [
+              "2d142352c662bb18",
+              "d51a0c2427374297",
+              "b5b11d9a198c3919",
+              "27bab8ec652e851f",
+              "42604f5d3ef8174c"
+            ]
+          },
+          {
+            "event": "context_fault",
+            "turn": 1
+          },
+          {
+            "event": "working",
+            "turn": 2,
+            "estimated_prompt_tokens": 33884
+          },
+          {
+            "event": "worker_response",
+            "turn": 2,
+            "kind": "patch",
+            "usage": {
+              "input_tokens": 49836,
+              "cached_input_tokens": 13056,
+              "output_tokens": 46084,
+              "reasoning_output_tokens": 45655,
+              "elapsed_ms": 835043,
+              "event_count": 4,
+              "tool_call_count": 0
+            },
+            "page_ids": [
+              "2d142352c662bb18",
+              "d51a0c2427374297",
+              "b5b11d9a198c3919",
+              "27bab8ec652e851f",
+              "42604f5d3ef8174c",
+              "adb6a52667750fdb",
+              "de621e2987ffc29b",
+              "f2d687f74b8bb6f0",
+              "4e3fd22ee2b75821",
+              "420dc2af2b8b9104",
+              "506395a1511435e7",
+              "5a49aa3d3c67a9ab",
+              "e6c12c99494e7aa6",
+              "465c68960546b545",
+              "8a80fc5efe6c4afe",
+              "cb788d1649c6857a",
+              "46e6fded86368da4",
+              "b4ed3fa65e1ded30",
+              "9167cd65ef68b7f2",
+              "7de27d5d7588e3a9",
+              "04481149ca321b65",
+              "c8e5b366a8e0ccc6",
+              "3a0749ccbdf2bfdb",
+              "4674f6828ce36a45"
+            ]
+          },
+          {
+            "event": "patching",
+            "turn": 2
+          },
+          {
+            "event": "patch_rejected",
+            "turn": 2,
+            "error": "patch path escapes workspace: /tmp/unused"
+          },
+          {
+            "event": "working",
+            "turn": 3,
+            "estimated_prompt_tokens": 33813
+          },
+          {
+            "event": "worker_response",
+            "turn": 3,
+            "kind": "context_request",
+            "usage": {
+              "input_tokens": 49787,
+              "cached_input_tokens": 13056,
+              "output_tokens": 678,
+              "reasoning_output_tokens": 516,
+              "elapsed_ms": 19250,
+              "event_count": 4,
+              "tool_call_count": 0
+            },
+            "page_ids": [
+              "2d142352c662bb18",
+              "d51a0c2427374297",
+              "b5b11d9a198c3919",
+              "27bab8ec652e851f",
+              "42604f5d3ef8174c",
+              "adb6a52667750fdb",
+              "de621e2987ffc29b",
+              "f2d687f74b8bb6f0",
+              "4e3fd22ee2b75821",
+              "420dc2af2b8b9104",
+              "506395a1511435e7",
+              "5a49aa3d3c67a9ab",
+              "e6c12c99494e7aa6",
+              "465c68960546b545",
+              "8a80fc5efe6c4afe",
+              "cb788d1649c6857a",
+              "46e6fded86368da4",
+              "b4ed3fa65e1ded30",
+              "9167cd65ef68b7f2",
+              "7de27d5d7588e3a9",
+              "04481149ca321b65",
+              "c8e5b366a8e0ccc6",
+              "3a0749ccbdf2bfdb",
+              "4674f6828ce36a45"
+            ]
+          },
+          {
+            "event": "context_fault",
+            "turn": 3
+          },
+          {
+            "event": "working",
+            "turn": 4,
+            "estimated_prompt_tokens": 38924
+          },
+          {
+            "event": "worker_response",
+            "turn": 4,
+            "kind": "patch",
+            "usage": {
+              "input_tokens": 54767,
+              "cached_input_tokens": 0,
+              "output_tokens": 30557,
+              "reasoning_output_tokens": 29006,
+              "elapsed_ms": 555701,
+              "event_count": 4,
+              "tool_call_count": 0
+            },
+            "page_ids": [
+              "2d142352c662bb18",
+              "d51a0c2427374297",
+              "b5b11d9a198c3919",
+              "27bab8ec652e851f",
+              "42604f5d3ef8174c",
+              "adb6a52667750fdb",
+              "de621e2987ffc29b",
+              "f2d687f74b8bb6f0",
+              "4e3fd22ee2b75821",
+              "420dc2af2b8b9104",
+              "506395a1511435e7",
+              "5a49aa3d3c67a9ab",
+              "e6c12c99494e7aa6",
+              "465c68960546b545",
+              "8a80fc5efe6c4afe",
+              "cb788d1649c6857a",
+              "46e6fded86368da4",
+              "b4ed3fa65e1ded30",
+              "9167cd65ef68b7f2",
+              "7de27d5d7588e3a9",
+              "04481149ca321b65",
+              "c8e5b366a8e0ccc6",
+              "3a0749ccbdf2bfdb",
+              "4674f6828ce36a45",
+              "006ee9aa0d56d1c8",
+              "72c804a6bd430ecc",
+              "daf586b59f098488"
+            ]
+          },
+          {
+            "event": "patching",
+            "turn": 4
+          },
+          {
+            "event": "patched",
+            "turn": 4,
+            "changed_paths": [
+              "src/_pytest/main.py",
+              "testing/test_conftest.py"
+            ]
+          },
+          {
+            "event": "verified",
+            "turn": 4
+          },
+          {
+            "event": "finished",
+            "status": "verified",
+            "accepted": true
+          }
+        ]
+      },
+      "command": [
+        "astra-ultra",
+        "run",
+        "--worker",
+        "codex",
+        "--model",
+        "gpt-5.6-luna",
+        "--effort",
+        "max"
+      ],
+      "tests": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "-c",
+          "import os,sys,tempfile,pathlib;b=pathlib.Path(tempfile.mkdtemp(prefix='pytest-benchmark-bootstrap-'));pathlib.Path(b,'sitecustomize.py').write_text(\"import sys,types\"+chr(10)+\"m=types.ModuleType('_pytest._version')\"+chr(10)+\"m.version='9.1.0.dev0'\"+chr(10)+\"m.version_tuple=(9,1,0,'dev0')\"+chr(10)+\"sys.modules['_pytest._version']=m\"+chr(10)+\"import _pytest\"+chr(10)+\"_pytest._version=m\"+chr(10),encoding='utf-8');s=os.path.abspath('src');o=os.environ.get('PYTHONPATH');os.environ['PYTHONPATH']=os.pathsep.join([str(b),s]+([o] if o else []));sys.path[:0]=[str(b),s];import sitecustomize,pytest;raise SystemExit(pytest.main(['testing/test_conftest.py','-q','--disable-warnings','--maxfail=5','-k','test_conftest_fixture_from_ancestor_above_rootdir or fixture_closure_order_independence_with_parametrize']))"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 2.81,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.tests.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.tests.stderr.txt",
+        "output_preview": "..                                                                       [100%]\n2 passed, 56 deselected in 0.80s\n\n"
+      },
+      "external_acceptance": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\acceptance_harness.py"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 12.88,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.acceptance.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\astra-ultra.acceptance.stderr.txt",
+        "output_preview": "{\"accepted\": true, \"runs\": [{\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.05s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/tts/test_init.py::test_setup_no_access[error_value]\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\n\\n3 tests collected in 0.02s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/test_config_entries.py::test_config\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.03s\\n\"}]}\n\n"
+      },
+      "diff": {
+        "changed_files": [
+          "src/_pytest/main.py",
+          "testing/test_conftest.py"
+        ],
+        "changed_file_count": 2,
+        "test_files_changed": [
+          "testing/test_conftest.py"
+        ],
+        "lines_added": 110,
+        "lines_deleted": 0,
+        "diff_check_passed": true,
+        "diff_check_output": ""
+      },
+      "criteria": {
+        "collection_identity_surface": true,
+        "fixture_regression_surface": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "codex_completed": true,
+        "no_whitespace_errors": true
+      },
+      "completion_criteria": {
+        "codex_completed": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "no_whitespace_errors": true
+      },
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "failure_reasons": [],
+      "accepted": true
+    },
+    {
+      "variant": "lattice",
+      "returncode": 0,
+      "agent_success": true,
+      "status": "accepted",
+      "internal_status": "passed",
+      "elapsed_seconds": 437.5,
+      "usage": {
+        "input_tokens": 2254889,
+        "cached_input_tokens": 2089216,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15324,
+        "reasoning_output_tokens": 9588
+      },
+      "usage_complete": true,
+      "estimated_cost_usd": 0.17742,
+      "observed": {
+        "event_count": 52,
+        "turn_count": 5,
+        "tool_call_count": null,
+        "observed_model": "gpt-5.6-luna",
+        "observed_effort": "max"
+      },
+      "lattice_telemetry": {
+        "schemaVersion": 2,
+        "modelInputTokens": 2254889,
+        "cachedInputTokens": 2089216,
+        "outputTokens": 15324,
+        "reasoningTokens": 9588,
+        "totalTokens": null,
+        "costUsd": null,
+        "initialContextCharacters": 159968,
+        "initialContextEstimatedTokens": 39997,
+        "loadedPageCount": 6,
+        "loadedContextCharacters": 159611,
+        "pageFaults": 4,
+        "workerTurns": 5,
+        "protocolRepairTurns": 0,
+        "stageMs": {
+          "index": 31579,
+          "worker": 18213,
+          "transaction": 20049
+        },
+        "verificationDurationMs": 17795,
+        "changedFileCount": 2,
+        "nonCachedInputTokens": 165673,
+        "turnUsage": [
+          {
+            "turnNumber": 1,
+            "kind": "initial",
+            "inputTokens": 69927,
+            "cachedInputTokens": 11008,
+            "nonCachedInputTokens": 58919,
+            "outputTokens": 596,
+            "reasoningTokens": 509,
+            "costUsd": null,
+            "elapsedMs": 17634,
+            "rawResponseSha256": "8dd6f254da1084c5ecaaa091500d74e54be034d3a761b44841801c460650a9a2",
+            "detectedEnvelopeShape": "canonical_context_request",
+            "normalizationResult": "canonical_context_request",
+            "validationError": null
+          },
+          {
+            "turnNumber": 2,
+            "kind": "context_fault",
+            "inputTokens": 74301,
+            "cachedInputTokens": 69376,
+            "nonCachedInputTokens": 4925,
+            "outputTokens": 693,
+            "reasoningTokens": 542,
+            "costUsd": null,
+            "elapsedMs": 18059,
+            "rawResponseSha256": "ab96d5a64a9b9223cae2aad280c251002fde8dca75077adc400df5b5b00b9079",
+            "detectedEnvelopeShape": "canonical_context_request",
+            "normalizationResult": "canonical_context_request",
+            "validationError": null
+          },
+          {
+            "turnNumber": 3,
+            "kind": "context_fault",
+            "inputTokens": 922271,
+            "cachedInputTokens": 864000,
+            "nonCachedInputTokens": 58271,
+            "outputTokens": 1829,
+            "reasoningTokens": 1250,
+            "costUsd": null,
+            "elapsedMs": 68248,
+            "rawResponseSha256": "5bff9746caf54f4e230f602fce078f370c440f720a8674f4ffd79a112360b367",
+            "detectedEnvelopeShape": "canonical_context_request",
+            "normalizationResult": "canonical_context_request",
+            "validationError": null
+          },
+          {
+            "turnNumber": 4,
+            "kind": "context_fault",
+            "inputTokens": 127904,
+            "cachedInputTokens": 126720,
+            "nonCachedInputTokens": 1184,
+            "outputTokens": 749,
+            "reasoningTokens": 680,
+            "costUsd": null,
+            "elapsedMs": 18936,
+            "rawResponseSha256": "9c45b9a91e56113f911951b80bec155b5fd5aca02033b74a5e74bed59e899d2f",
+            "detectedEnvelopeShape": "canonical_context_request",
+            "normalizationResult": "canonical_context_request",
+            "validationError": null
+          },
+          {
+            "turnNumber": 5,
+            "kind": "context_fault",
+            "inputTokens": 1060486,
+            "cachedInputTokens": 1018112,
+            "nonCachedInputTokens": 42374,
+            "outputTokens": 11457,
+            "reasoningTokens": 6607,
+            "costUsd": null,
+            "elapsedMs": 227724,
+            "rawResponseSha256": "9e8605e65a098a047073701b4bb185499c670c7247dfaf8e58d44b74a71cf23c",
+            "detectedEnvelopeShape": "canonical_patch",
+            "normalizationResult": "canonical_patch",
+            "validationError": null
+          }
+        ],
+        "promptManifests": [
+          {
+            "turnNumber": 1,
+            "kind": "initial",
+            "stablePrefixCharacters": 1065,
+            "taskCharacters": 7426,
+            "repositoryMapCharacters": 10117,
+            "contextCharacters": 178427,
+            "protocolCharacters": 415,
+            "continuationCharacters": 0,
+            "historyCharacters": null,
+            "stablePrefixSha256": "4d8ade6042290e9f7fc5d503725b23770cbbd51e45c8d15d39b2dfb6c7414aae"
+          },
+          {
+            "turnNumber": 2,
+            "kind": "context_fault",
+            "stablePrefixCharacters": 0,
+            "taskCharacters": 0,
+            "repositoryMapCharacters": 0,
+            "contextCharacters": 13338,
+            "protocolCharacters": 0,
+            "continuationCharacters": 74,
+            "historyCharacters": null,
+            "stablePrefixSha256": "4d8ade6042290e9f7fc5d503725b23770cbbd51e45c8d15d39b2dfb6c7414aae"
+          },
+          {
+            "turnNumber": 3,
+            "kind": "context_fault",
+            "stablePrefixCharacters": 0,
+            "taskCharacters": 0,
+            "repositoryMapCharacters": 0,
+            "contextCharacters": 39917,
+            "protocolCharacters": 0,
+            "continuationCharacters": 74,
+            "historyCharacters": null,
+            "stablePrefixSha256": "4d8ade6042290e9f7fc5d503725b23770cbbd51e45c8d15d39b2dfb6c7414aae"
+          },
+          {
+            "turnNumber": 4,
+            "kind": "context_fault",
+            "stablePrefixCharacters": 0,
+            "taskCharacters": 0,
+            "repositoryMapCharacters": 0,
+            "contextCharacters": 2,
+            "protocolCharacters": 0,
+            "continuationCharacters": 74,
+            "historyCharacters": null,
+            "stablePrefixSha256": "4d8ade6042290e9f7fc5d503725b23770cbbd51e45c8d15d39b2dfb6c7414aae"
+          },
+          {
+            "turnNumber": 5,
+            "kind": "context_fault",
+            "stablePrefixCharacters": 0,
+            "taskCharacters": 0,
+            "repositoryMapCharacters": 0,
+            "contextCharacters": 47071,
+            "protocolCharacters": 0,
+            "continuationCharacters": 74,
+            "historyCharacters": null,
+            "stablePrefixSha256": "4d8ade6042290e9f7fc5d503725b23770cbbd51e45c8d15d39b2dfb6c7414aae"
+          }
+        ],
+        "editGrantCount": 32,
+        "resolvedEditGrantCount": 2,
+        "rejectedEditGrantReason": null,
+        "editGrantMappingSha256": "bdbe4f1113fbb8335d16507323c16a0bad2f8c8ebdd7e5f9a0413b607dddd5a4",
+        "patchLoweringDurationMs": 4,
+        "providerProtocolVersion": 4,
+        "internalPatchVersion": 1,
+        "runtimeStateTransitions": [
+          {
+            "from": null,
+            "to": "CREATED",
+            "at": "2026-09-09T00:16:33.265Z"
+          },
+          {
+            "from": "CREATED",
+            "to": "COMPILED",
+            "at": "2026-09-09T00:16:33.266Z"
+          },
+          {
+            "from": "COMPILED",
+            "to": "INDEXED",
+            "at": "2026-09-09T00:17:04.866Z"
+          },
+          {
+            "from": "INDEXED",
+            "to": "CONTEXT_GRANTED",
+            "at": "2026-09-09T00:17:11.388Z"
+          },
+          {
+            "from": "CONTEXT_GRANTED",
+            "to": "WORKER_RUNNING",
+            "at": "2026-09-09T00:17:11.403Z"
+          },
+          {
+            "from": "WORKER_RUNNING",
+            "to": "RESPONSE_NORMALIZED",
+            "at": "2026-09-09T00:17:29.616Z"
+          },
+          {
+            "from": "RESPONSE_NORMALIZED",
+            "to": "RESPONSE_VALIDATED",
+            "at": "2026-09-09T00:17:29.616Z"
+          },
+          {
+            "from": "RESPONSE_VALIDATED",
+            "to": "CONTEXT_FAULT",
+            "at": "2026-09-09T00:17:29.616Z"
+          },
+          {
+            "from": "CONTEXT_FAULT",
+            "to": "CONTEXT_GRANTED",
+            "at": "2026-09-09T00:17:34.662Z"
+          },
+          {
+            "from": "CONTEXT_GRANTED",
+            "to": "WORKER_RUNNING",
+            "at": "2026-09-09T00:17:34.662Z"
+          },
+          {
+            "from": "WORKER_RUNNING",
+            "to": "RESPONSE_NORMALIZED",
+            "at": "2026-09-09T00:17:52.722Z"
+          },
+          {
+            "from": "RESPONSE_NORMALIZED",
+            "to": "RESPONSE_VALIDATED",
+            "at": "2026-09-09T00:17:52.722Z"
+          },
+          {
+            "from": "RESPONSE_VALIDATED",
+            "to": "CONTEXT_FAULT",
+            "at": "2026-09-09T00:17:52.722Z"
+          },
+          {
+            "from": "CONTEXT_FAULT",
+            "to": "CONTEXT_GRANTED",
+            "at": "2026-09-09T00:17:58.363Z"
+          },
+          {
+            "from": "CONTEXT_GRANTED",
+            "to": "WORKER_RUNNING",
+            "at": "2026-09-09T00:17:58.363Z"
+          },
+          {
+            "from": "WORKER_RUNNING",
+            "to": "RESPONSE_NORMALIZED",
+            "at": "2026-09-09T00:19:06.612Z"
+          },
+          {
+            "from": "RESPONSE_NORMALIZED",
+            "to": "RESPONSE_VALIDATED",
+            "at": "2026-09-09T00:19:06.612Z"
+          },
+          {
+            "from": "RESPONSE_VALIDATED",
+            "to": "CONTEXT_FAULT",
+            "at": "2026-09-09T00:19:06.612Z"
+          },
+          {
+            "from": "CONTEXT_FAULT",
+            "to": "CONTEXT_GRANTED",
+            "at": "2026-09-09T00:19:12.607Z"
+          },
+          {
+            "from": "CONTEXT_GRANTED",
+            "to": "WORKER_RUNNING",
+            "at": "2026-09-09T00:19:12.607Z"
+          },
+          {
+            "from": "WORKER_RUNNING",
+            "to": "RESPONSE_NORMALIZED",
+            "at": "2026-09-09T00:19:31.543Z"
+          },
+          {
+            "from": "RESPONSE_NORMALIZED",
+            "to": "RESPONSE_VALIDATED",
+            "at": "2026-09-09T00:19:31.543Z"
+          },
+          {
+            "from": "RESPONSE_VALIDATED",
+            "to": "CONTEXT_FAULT",
+            "at": "2026-09-09T00:19:31.543Z"
+          },
+          {
+            "from": "CONTEXT_FAULT",
+            "to": "CONTEXT_GRANTED",
+            "at": "2026-09-09T00:19:37.568Z"
+          },
+          {
+            "from": "CONTEXT_GRANTED",
+            "to": "WORKER_RUNNING",
+            "at": "2026-09-09T00:19:37.568Z"
+          },
+          {
+            "from": "WORKER_RUNNING",
+            "to": "RESPONSE_NORMALIZED",
+            "at": "2026-09-09T00:23:25.294Z"
+          },
+          {
+            "from": "RESPONSE_NORMALIZED",
+            "to": "RESPONSE_VALIDATED",
+            "at": "2026-09-09T00:23:25.294Z"
+          },
+          {
+            "from": "RESPONSE_VALIDATED",
+            "to": "PATCH_LOWERED",
+            "at": "2026-09-09T00:23:25.298Z"
+          },
+          {
+            "from": "PATCH_LOWERED",
+            "to": "TRANSACTION_RUNNING",
+            "at": "2026-09-09T00:23:25.298Z"
+          },
+          {
+            "from": "TRANSACTION_RUNNING",
+            "to": "VERIFYING",
+            "at": "2026-09-09T00:23:27.426Z"
+          },
+          {
+            "from": "VERIFYING",
+            "to": "PASSED",
+            "at": "2026-09-09T00:23:45.347Z",
+            "reason": "verification and acceptance evidence passed"
+          }
+        ],
+        "terminalStateReason": "verification and acceptance evidence passed",
+        "verifiedPatchCacheHit": false,
+        "verifiedPatchCacheKey": "eb18010133f2126e9261e72a0327aa78a8252e792bdf96a24522e10a87a0f696"
+      },
+      "response_preview": "+        encoding=\"utf-8\",\n+    )\n+\n+    # tests/components/ with its conftest\n+    components = tests / \"components\"\n+    components.mkdir()\n+    components.joinpath(\"__init__.py\").write_text(\"\", encoding=\"utf-8\")\n+    components.joinpath(\"conftest.py\").write_text(\n+        textwrap.dedent(\n+            \"\"\"\n+            import pytest\n+\n+            @pytest.fixture\n+            def cache_dir_side_effect():\n+                return None\n+\n+            @pytest.fixture\n+            def mock_init_cache_dir(cache_dir_side_effect):\n+                return cache_dir_side_effect\n+\n+            @pytest.fixture\n+            def mock_cache_dir(mock_init_cache_dir):\n+                return mock_init_cache_dir\n+            \"\"\"\n+        ),\n+        encoding=\"utf-8\",\n+    )\n+\n+    # tests/components/water_heater/ - unrelated test directory\n+    water_heater = components / \"water_heater\"\n+    water_heater.mkdir()\n+    water_heater.joinpath(\"__init__.py\").write_text(\"\", encoding=\"utf-8\")\n+    water_heater.joinpath(\"test_water_heater.py\").write_text(\n+        textwrap.dedent(\n+            \"\"\"\n+            def test_water_heater():\n+                pass\n+            \"\"\"\n+        ),\n+        encoding=\"utf-8\",\n+    )\n+\n+    # tests/components/tts/ - the problematic test directory\n+    tts = components / \"tts\"\n+    tts.mkdir()\n+    tts.joinpath(\"__init__.py\").write_text(\"\", encoding=\"utf-8\")\n+    tts.joinpath(\"conftest.py\").write_text(\n+        textwrap.dedent(\n+            \"\"\"\n+            import pytest\n+\n+            @pytest.fixture(autouse=True)\n+            def mock_cache_dir(mock_cache_dir):\n+                # Autouse override that requests the parent fixture of same name\n+                return mock_cache_dir\n+            \"\"\"\n+        ),\n+        encoding=\"utf-8\",\n+    )\n+    tts.joinpath(\"test_init.py\").write_text(\n+        textwrap.dedent(\n+            \"\"\"\n+            import pytest\n+\n+            @pytest.mark.parametrize(\"cache_dir_side_effect\", [\"error_value\"])\n+            async def test_setup_no_access(mock_init_cache_dir):\n+                assert mock_init_cache_dir == \"error_value\"\n+            \"\"\"\n+        ),\n+        encoding=\"utf-8\",\n+    )\n+\n+    # tests/test_config_entries.py - another unrelated test\n+    tests.joinpath(\"test_config_entries.py\").write_text(\n+        textwrap.dedent(\n+            \"\"\"\n+            def test_config():\n+                pass\n+            \"\"\"\n+        ),\n+        encoding=\"utf-8\",\n+    )\n+\n+    # This order triggers the bug: collecting water_heater and config_entries\n+    # BEFORE tts causes the fixture closure to be wrong.\n+    result = pytester.runpytest(\n+        \"--collect-only\",\n+        str(water_heater),\n+        str(tests / \"test_config_entries.py\"),\n+        str(tts / \"test_init.py\"),\n+    )\n+    result.stdout.fnmatch_lines([\"*test_setup_no_access*\"])\n+    assert result.ret == ExitCode.OK\n+\n def test_required_option_help(pytester: Pytester) -> None:\n     pytester.makeconftest(\"assert 0\")\n     x = pytester.mkdir(\"x\")",
+      "worktree": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\lattice",
+      "evaluation_worktree": "C:\\bt\\pytest-14635-fixture-clo-985871967900\\.lattice-tx-431ce1fe-8fdb-49e5-927f-65902fb2dee7",
+      "events_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.stderr.txt",
+      "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.stderr.txt",
+      "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.stdout.txt",
+      "lattice_result_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.lattice-result.json",
+      "prompt_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.prompt.txt",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\comparison-targets\\lattice\\dist\\cli.js",
+        "run",
+        "# Real GitHub task\n\n- Repository: https://github.com/pytest-dev/pytest.git\n- Issue: https://github.com/pytest-dev/pytest/issues/14635\n- Related fix: https://github.com/pytest-dev/pytest/pull/14645\n- Title: Fixture closure changes when common parent directories are collected repeatedly\n\n## Problem\n\nPytest 9.1.x can lose a transitive parametrized fixture from a test's fixture\nclosure when multiple test paths with shared parent directories are collected\nin one invocation. The same target test can collect successfully in isolation\nor when the paths are given in another order, but fail with `function uses no\nargument ...` after an unrelated directory was collected first.\n\nThe regression comes from re-collection creating fresh `Directory` nodes while\nfixture registration and closure state are keyed by node identity. The fix\nmust preserve the identity of already-collected directory children without\nhardcoding Home Assistant or this reproduction's paths.\n\n## Required behavior\n\n1. Make the collection/fixture behavior independent of the order in which\n   unrelated paths sharing a parent are supplied.\n2. Preserve normal collection, duplicate-path handling, and third-party\n   directory collector behavior.\n3. Add a deterministic regression test under `testing/` that exercises a\n   transitive parametrized fixture and repeated collection of common parents.\n4. Keep the implementation focused; do not change dependencies or generated\n   files.\n\n## Acceptance contract\n\n- The independent oracle repeats the official fixture topology in three path\n  orders and collects the parametrized target every time.\n- The targeted pytest collector tests pass.\n- The diff contains both a collector implementation change and a regression\n  test; production-only patches are incomplete.\n- The solution must be general rather than a special case for the fixture or\n  directory names in the oracle.\n\n## Suggested workflow\n\n1. Read `src/_pytest/main.py`, the node/fixture collection code, and the\n   existing `testing/test_conftest.py` tests.\n2. Reproduce the order-dependent collection failure before editing.\n3. Trace how `_collection_cache`, `Directory` nodes, and fixture registration\n   interact during re-collection.\n4. Implement the smallest identity-preserving fix and add the regression.\n5. Run the targeted collector tests and the issue oracle.\n\nDo not commit or push. Work only in the provided detached worktree.\n\n\nLattice benchmark constraints:\n- Work only in the supplied repository workspace; do not commit or push.\n- Implement the smallest general fix, add the focused regression test, and preserve unrelated behavior.\n- The patch is incomplete unless it changes the implementation surface and a\n  focused regression test required by the task; do not return a production-only\n  patch. Use the task's stated test surface and preserve unrelated behavior.\n- Use this exact verification command when validating the transaction:\n  `uv run --no-project --with-editable . pytest testing/test_conftest.py -q --disable-warnings --maxfail=5`\n- The host will run the independent acceptance oracle after your transaction.\n- Return a canonical patch through the Lattice worker protocol; do not merely describe the change.\n",
+        "--worker",
+        "codex",
+        "--workspace",
+        "C:\\bt\\pytest-14635-fixture-clo-985871967900\\lattice",
+        "--model",
+        "gpt-5.6-luna",
+        "--reasoning-effort",
+        "max",
+        "--json",
+        "--retain-worktree",
+        "--no-verified-cache"
+      ],
+      "tests": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "-c",
+          "import os,sys,tempfile,pathlib;b=pathlib.Path(tempfile.mkdtemp(prefix='pytest-benchmark-bootstrap-'));pathlib.Path(b,'sitecustomize.py').write_text(\"import sys,types\"+chr(10)+\"m=types.ModuleType('_pytest._version')\"+chr(10)+\"m.version='9.1.0.dev0'\"+chr(10)+\"m.version_tuple=(9,1,0,'dev0')\"+chr(10)+\"sys.modules['_pytest._version']=m\"+chr(10)+\"import _pytest\"+chr(10)+\"_pytest._version=m\"+chr(10),encoding='utf-8');s=os.path.abspath('src');o=os.environ.get('PYTHONPATH');os.environ['PYTHONPATH']=os.pathsep.join([str(b),s]+([o] if o else []));sys.path[:0]=[str(b),s];import sitecustomize,pytest;raise SystemExit(pytest.main(['testing/test_conftest.py','-q','--disable-warnings','--maxfail=5','-k','test_conftest_fixture_from_ancestor_above_rootdir or fixture_closure_order_independence_with_parametrize']))"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 5.1,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.tests.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.tests.stderr.txt",
+        "output_preview": "..                                                                       [100%]\n2 passed, 56 deselected in 0.56s\n\n"
+      },
+      "external_acceptance": {
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--with",
+          "pluggy>=1.5,<2",
+          "--with",
+          "packaging>=22",
+          "--with",
+          "pygments>=2.7.2",
+          "--with",
+          "iniconfig>=1.0.1",
+          "--with",
+          "colorama>=0.4",
+          "python",
+          "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\acceptance_harness.py"
+        ],
+        "returncode": 0,
+        "elapsed_seconds": 10.59,
+        "stdout_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.acceptance.stdout.txt",
+        "stderr_path": "C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\lattice.acceptance.stderr.txt",
+        "output_preview": "{\"accepted\": true, \"runs\": [{\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.03s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/components/tts/test_init.py::test_setup_no_access[error_value]\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/test_config_entries.py::test_config\\n\\n3 tests collected in 0.03s\\n\"}, {\"returncode\": 0, \"collected_target\": true, \"stdout_tail\": \"tests/test_config_entries.py::test_config\\ntests/components/water_heater/test_water_heater.py::test_water_heater\\ntests/components/tts/test_init.py::test_setup_no_access[error_value]\\n\\n3 tests collected in 0.02s\\n\"}]}\n\n"
+      },
+      "diff": {
+        "changed_files": [
+          "src/_pytest/main.py",
+          "testing/test_conftest.py"
+        ],
+        "changed_file_count": 2,
+        "test_files_changed": [
+          "testing/test_conftest.py"
+        ],
+        "lines_added": 144,
+        "lines_deleted": 0,
+        "diff_check_passed": true,
+        "diff_check_output": ""
+      },
+      "criteria": {
+        "collection_identity_surface": true,
+        "fixture_regression_surface": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "codex_completed": true,
+        "no_whitespace_errors": true
+      },
+      "completion_criteria": {
+        "codex_completed": true,
+        "tests_touched": true,
+        "targeted_suite_green": true,
+        "external_acceptance_green": true,
+        "no_whitespace_errors": true
+      },
+      "functional_acceptance": true,
+      "implementation_complete": true,
+      "failure_reasons": [],
+      "accepted": true
+    }
+  ],
+  "totals": {
+    "baseline": {
+      "input_tokens": 4110495,
+      "cached_input_tokens": 3973376,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 33598,
+      "reasoning_output_tokens": 21270,
+      "estimated_cost_usd": 0.27426,
+      "elapsed_seconds": 807.94,
+      "test_elapsed_seconds": 5.11,
+      "acceptance_elapsed_seconds": 10.57,
+      "event_count": 146,
+      "turn_count": 1,
+      "tool_call_count": 124,
+      "accepted": true,
+      "changed_file_count": 3,
+      "lines_added": 135,
+      "lines_deleted": 0
+    },
+    "astra-ultra": {
+      "input_tokens": 173161,
+      "cached_input_tokens": 26112,
+      "cache_write_input_tokens": null,
+      "output_tokens": 78113,
+      "reasoning_output_tokens": 75785,
+      "estimated_cost_usd": 0.12367,
+      "elapsed_seconds": 1446.05,
+      "test_elapsed_seconds": 2.81,
+      "acceptance_elapsed_seconds": 12.88,
+      "event_count": 19,
+      "turn_count": 4,
+      "tool_call_count": 0,
+      "accepted": true,
+      "changed_file_count": 2,
+      "lines_added": 110,
+      "lines_deleted": 0
+    },
+    "lattice": {
+      "input_tokens": 2254889,
+      "cached_input_tokens": 2089216,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 15324,
+      "reasoning_output_tokens": 9588,
+      "estimated_cost_usd": 0.17742,
+      "elapsed_seconds": 437.5,
+      "test_elapsed_seconds": 5.1,
+      "acceptance_elapsed_seconds": 10.59,
+      "event_count": 52,
+      "turn_count": 5,
+      "tool_call_count": null,
+      "accepted": true,
+      "changed_file_count": 2,
+      "lines_added": 144,
+      "lines_deleted": 0
+    }
+  },
+  "metrics": {
+    "expected_variants": 3,
+    "input_token_change_pct": -95.79,
+    "cached_input_change_pct": -99.34,
+    "output_token_change_pct": 132.49,
+    "reasoning_token_change_pct": 256.3,
+    "latency_change_pct": 78.98,
+    "test_latency_change_pct": -45.01,
+    "cost_change_pct": -54.91,
+    "tool_call_change_pct": -100.0,
+    "speedup_factor": 0.559,
+    "accepted_variants": 3,
+    "functional_acceptance_variants": 3,
+    "completed_variants": 3,
+    "comparison_vs_baseline": {
+      "astra-ultra": {
+        "input_token_change_pct": -95.79,
+        "cached_input_change_pct": -99.34,
+        "output_token_change_pct": 132.49,
+        "reasoning_token_change_pct": 256.3,
+        "latency_change_pct": 78.98,
+        "test_latency_change_pct": -45.01,
+        "cost_change_pct": -54.91,
+        "tool_call_change_pct": -100.0,
+        "speedup_factor": 0.559
+      },
+      "lattice": {
+        "input_token_change_pct": -45.14,
+        "cached_input_change_pct": -47.42,
+        "output_token_change_pct": -54.39,
+        "reasoning_token_change_pct": -54.92,
+        "latency_change_pct": -45.85,
+        "test_latency_change_pct": -0.2,
+        "cost_change_pct": -35.31,
+        "tool_call_change_pct": null,
+        "speedup_factor": 1.847
+      }
+    }
+  },
+  "limitations": [
+    "One issue and one live trial per variant; repeat with randomized order for a stronger estimate.",
+    "Token and cost values are Codex telemetry; reasoning tokens are a subset of output tokens.",
+    "Lattice is measured through its own runtime; its aggregate provider usage and stage timings are preserved in lattice_telemetry.",
+    "The public Lattice v1.0.0 checkout needed a local benchmark adapter for Python/TOML indexing, uv verification, and max effort; the adapter diff is visible in the cloned comparison checkout.",
+    "Functional acceptance and complete implementation are reported separately: a timeout can pass the black-box harness without being a finished contribution.",
+    "The external acceptance harness tests the observable issue contract and does not replace maintainer review."
+  ]
+}

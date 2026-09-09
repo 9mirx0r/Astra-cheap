@@ -65,6 +65,34 @@ def main() -> int:
     mcp_p = subparsers.add_parser("mcp", help="Run FastMCP stdio symbol server")
     mcp_p.add_argument("--test", action="store_true", help="Run self-test verification")
 
+    # Observable runtime
+    run_p = subparsers.add_parser("run", help="Run one bounded task through the Astra runtime")
+    run_p.add_argument("--root", default=".", help="Task workspace root")
+    run_p.add_argument("--task-id", default="astra-task", help="Stable task identifier")
+    run_p.add_argument("--objective", required=True, help="Task objective")
+    run_p.add_argument("--test-command-json", default="[]", help="Verification argv as a JSON array")
+    run_p.add_argument(
+        "--acceptance-command-json",
+        default="[]",
+        help="Independent acceptance-oracle argv as a JSON array",
+    )
+    run_p.add_argument("--allowed-path", action="append", default=[], help="Allowed changed/context path (repeatable)")
+    run_p.add_argument("--focus-path", action="append", default=[], help="Initial context focus path (repeatable)")
+    run_p.add_argument("--focus-term", action="append", default=[], help="Initial context term (repeatable)")
+    run_p.add_argument("--context-budget", type=int, default=4096)
+    run_p.add_argument("--page-budget", type=int, default=1200)
+    run_p.add_argument("--max-page-faults", type=int, default=4)
+    run_p.add_argument("--max-turns", type=int, default=4)
+    run_p.add_argument("--max-recoveries", type=int, default=2)
+    run_p.add_argument("--verification-timeout", type=int, default=900)
+    run_p.add_argument("--worker", choices=["scripted", "codex"], default="scripted")
+    run_p.add_argument("--response-file", help="JSON array of scripted worker responses")
+    run_p.add_argument("--patch-file", help="Shortcut for one scripted patch response")
+    run_p.add_argument("--model", default="gpt-5.6-luna")
+    run_p.add_argument("--effort", default="max")
+    run_p.add_argument("--worker-timeout", type=int, default=900)
+    run_p.add_argument("--output", help="Optional JSON result path")
+
     # Governor
     gov_p = subparsers.add_parser("govern", help="Reasoning effort guidance and circuit breaker")
     gov_p.add_argument("--model", default="Luna-5.6", help="Model identifier")
@@ -100,6 +128,66 @@ def main() -> int:
     elif parsed.tool == "mcp":
         mcp_args = ["--test"] if parsed.test else []
         return run_subscript("astra_mcp_server.py", mcp_args + remaining)
+
+    elif parsed.tool == "run":
+        import json
+        from astra_contracts import TaskSpec
+        from astra_runtime import AstraRuntime
+        from astra_worker import CodexExecWorker, ScriptedWorker
+
+        def parse_argv_json(raw: str, flag: str) -> tuple[str, ...]:
+            value = json.loads(raw)
+            if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+                raise ValueError(f"{flag} must be a JSON array containing only strings")
+            return tuple(value)
+
+        try:
+            test_command = parse_argv_json(parsed.test_command_json, "--test-command-json")
+            acceptance_command = parse_argv_json(parsed.acceptance_command_json, "--acceptance-command-json")
+        except (TypeError, ValueError, json.JSONDecodeError) as exc:
+            print(
+                f"Error: --test-command-json and --acceptance-command-json must be JSON arrays: {exc}",
+                file=sys.stderr,
+            )
+            return 2
+        task = TaskSpec(
+            task_id=parsed.task_id,
+            objective=parsed.objective,
+            root=Path(parsed.root),
+            test_command=test_command,
+            acceptance_command=acceptance_command,
+            allowed_paths=tuple(parsed.allowed_path),
+            focus_paths=tuple(parsed.focus_path),
+            focus_terms=tuple(parsed.focus_term),
+            context_budget_tokens=parsed.context_budget,
+            page_budget_tokens=parsed.page_budget,
+            max_page_faults=parsed.max_page_faults,
+            max_turns=parsed.max_turns,
+            max_recoveries=parsed.max_recoveries,
+            verification_timeout_seconds=parsed.verification_timeout,
+        )
+        if parsed.worker == "codex":
+            worker = CodexExecWorker(parsed.model, parsed.effort, parsed.worker_timeout)
+        else:
+            responses = []
+            if parsed.response_file:
+                value = json.loads(Path(parsed.response_file).read_text(encoding="utf-8"))
+                responses = value.get("responses", []) if isinstance(value, dict) else value
+            elif parsed.patch_file:
+                responses = [{
+                    "kind": "patch",
+                    "patch": Path(parsed.patch_file).read_text(encoding="utf-8"),
+                }]
+            worker = ScriptedWorker(responses)
+        result = AstraRuntime(task).run(worker)
+        payload = result.to_dict()
+        output = json.dumps(payload, indent=2, ensure_ascii=False)
+        if parsed.output:
+            output_path = Path(parsed.output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(output + "\n", encoding="utf-8")
+        print(output)
+        return 0 if result.accepted else 2
 
     elif parsed.tool == "govern":
         if parsed.asymmetric:

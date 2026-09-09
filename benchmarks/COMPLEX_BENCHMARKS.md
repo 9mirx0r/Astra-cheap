@@ -2,6 +2,28 @@
 
 Este documento contiene la especificación completa, los comandos de ejecución y las métricas detalladas para correr **benchmarks de operaciones de extrema complejidad** en OpenAI Codex.
 
+> **Nota de vigencia:** las tablas históricas de este documento incluyen perfiles
+> calibrados de una versión anterior del runner. Para resultados live reproducibles,
+> costos con el rate card actual, paquetes de evidencia, timeouts y tool-call
+> telemetry, usar [`docs/REAL_BENCHMARK_2026-09-08.md`](../docs/REAL_BENCHMARK_2026-09-08.md),
+> el ledger de tres brazos
+> [`results_real_pytest-14635-fixture-closure.json`](results_real_pytest-14635-fixture-closure.json)
+> y [`ECOSYSTEM_COMPARISON.md`](ECOSYSTEM_COMPARISON.md). Las cifras sintéticas
+> más abajo no deben mezclarse con la evidencia live.
+
+## Resultado live vigente
+
+El benchmark real más reciente comparó Baseline, Astra-Ultra y Lattice sobre la
+misma tarea de pytest, el mismo commit base, `gpt-5.6-luna` en esfuerzo `max`,
+worktrees aislados y un plazo de una hora. Los tres pasaron la suite enfocada y
+el oráculo independiente.
+
+La conclusión operativa actual es que **Astra-Ultra es superior en eficiencia
+global**: US$0.12367 y 251.274 tokens totales frente a US$0.17742 y 2.270.213
+tokens de Lattice. **Lattice es superior sólo en latencia** en esta tarea:
+437,5 s frente a 1.446,05 s. Ver el detalle en el
+[`informe reproducible`](../docs/REAL_BENCHMARK_2026-09-08.md).
+
 El protocolo evalúa dos subagentes en condiciones idénticas sobre cargas de trabajo de alto consumo de tokens y razonamiento profundo (`Luna 5.6 en High Effort`, `Terra en Medium Effort`, `o1` y `o3-mini`):
 1. **Subagente 1 (Baseline)**: Ejecución estándar sin optimización ni directivas de ahorro.
 2. **Subagente 2 (Astra-Ultra)**: Ejecución gobernada por `$astra-ultra` (RepoMap $\le 1024$ tok, esqueletos AST, lectura acotada, bloqueo de prefijos invariantes y mitigación de razonamiento redundante).
@@ -87,12 +109,14 @@ Para ejecutar los benchmarks y generar automáticamente los registros de tokens,
 
 ### Ejecutar Carga 1 con Luna 5.6 en Esfuerzo Alto:
 ```powershell
-python benchmarks/run_heavy_benchmarks.py --workload raft_split_brain_recovery --model "Luna-5.6" --effort high --output benchmarks/luna_heavy_results.json --html benchmarks/luna_heavy_dashboard.html
+$env:ASTRA_BENCHMARK_LIVE="1"
+python benchmarks/run_heavy_benchmarks.py --workload raft_split_brain_recovery --model "gpt-5.6-luna" --effort auto --order baseline-first --output benchmarks/luna_heavy_results.json --html benchmarks/luna_heavy_dashboard.html
 ```
 
 ### Ejecutar Carga 2 con Terra en Esfuerzo Medio:
 ```powershell
-python benchmarks/run_heavy_benchmarks.py --workload mvcc_aries_dirty_read --model "Terra" --effort medium --output benchmarks/terra_heavy_results.json --html benchmarks/terra_heavy_dashboard.html
+$env:ASTRA_BENCHMARK_LIVE="1"
+python benchmarks/run_heavy_benchmarks.py --workload mvcc_aries_dirty_read --model "gpt-5.6-luna" --effort auto --order baseline-first --output benchmarks/terra_heavy_results.json --html benchmarks/terra_heavy_dashboard.html
 ```
 
 ---

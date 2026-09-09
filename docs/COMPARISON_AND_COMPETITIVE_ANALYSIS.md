@@ -88,6 +88,40 @@ This document presents a rigorous technical comparison between **Astra-Ultra** a
   3. **Reasoning Token Explosion in High Effort**: When Luna 5.6 or o1/o3-mini runs at high effort, feeding an unpruned terminal output causes the model to generate 35,000+ reasoning tokens analyzing noise.
   4. **Cache Busting**: Floating dynamic nonces or timestamps in system prompts invalidating the 1,024-token OpenAI cache.
 
+### 2.6 Astra-Ultra vs. Lattice (live evidence)
+
+Lattice is the closest architectural comparison in this repository because it
+also combines bounded context, provider protocols, transactional patching,
+verification, and telemetry. The latest three-arm live run accepted all three
+solutions, so the meaningful difference was efficiency and latency:
+
+| Metric | Astra-Ultra | Lattice | Current winner |
+| :--- | ---: | ---: | :--- |
+| Total tokens | **251,274** | 2,270,213 | Astra-Ultra |
+| Estimated cost | **US$0.12367** | US$0.17742 | Astra-Ultra |
+| Wall-clock time | 1,446.05 s | **437.50 s** | Lattice |
+| Reasoning tokens | 75,785 | **9,588** | Lattice |
+| Functional acceptance | yes | yes | tie |
+
+The current overall ranking for the project's primary objective is Astra-Ultra:
+it is the least expensive and most token-efficient while preserving the same
+acceptance result. Lattice is the speed leader on this task, not the overall
+efficiency leader.
+
+The architectural reason for the latency gap is concrete. Lattice starts a
+persistent Codex SDK thread, front-loads a larger initial context packet, and
+sends incremental context-fault pages. The current Astra worker invokes an
+ephemeral Codex process for each turn, starts with a much smaller packet, and
+must reconstruct more of the problem during recovery. Astra's first rejected
+patch caused one additional expensive synthesis turn.
+
+The correct lesson is to adopt Lattice's session continuity, incremental
+continuations, and structured edit handles while retaining Astra-Ultra's
+RepoMap, AST, sanitizer, bounded pages, and cost discipline. This is a
+mechanism-level comparison, not a claim that either runtime wins every task;
+the full evidence and limitations are in
+[`docs/REAL_BENCHMARK_2026-09-08.md`](REAL_BENCHMARK_2026-09-08.md).
+
 ---
 
 ## 3. Ambiguity Resolution: How Astra-Ultra Resolves Ambiguous Tasks

@@ -1,0 +1,189 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Three-arm real task benchmark</title>
+<style>
+:root { color-scheme: light dark; --background: light-dark(#f8fafc,#0b1020); --foreground: light-dark(#172033,#e8eefc); --muted-foreground: light-dark(#5e6b82,#a9b7d0); --border: light-dark(#d9e0eb,#2b3854); --viz-series-1: light-dark(#cf3d61,#fb7185); --viz-series-2: light-dark(#087f69,#34d399); --viz-series-3: light-dark(#1769aa,#7dd3fc); --popover: light-dark(#ffffff,#151f35); --popover-foreground: var(--foreground); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+main { max-width: 1024px; margin: 0 auto; padding: 28px 20px 56px; }
+h1 { margin: 0 0 8px; font-size: clamp(22px, 4vw, 34px); font-weight: 500; line-height: 1.15; }
+h2 { margin: 34px 0 10px; font-size: 18px; font-weight: 500; }
+.hero { border-bottom: 1px solid var(--border); padding-bottom: 18px; }
+.eyebrow { margin: 0 0 8px; color: var(--muted-foreground); font-size: 12px; letter-spacing: .08em; }
+.meta-line, .note { color: var(--muted-foreground); margin: 7px 0; }
+a { color: var(--viz-series-3); }
+code { color: var(--viz-series-3); overflow-wrap: anywhere; }
+.outcome { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; color: var(--muted-foreground); }
+.outcome strong { color: var(--viz-series-2); font-weight: 500; }
+.chart-wrap { width: 100%; }
+.chart { min-height: 160px; width: 100%; }
+.bar-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.bar-svg text { fill: var(--foreground); font-size: 12px; }
+.bar-svg .row-label { font-weight: 500; }
+.bar-svg .bar-value { fill: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.bar-svg .axis-title { fill: var(--muted-foreground); font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px 9px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: top; }
+th:first-child, td:first-child { text-align: left; }
+thead th { color: var(--muted-foreground); font-size: 12px; font-weight: 500; }
+td { font-variant-numeric: tabular-nums; }
+.pass { color: var(--viz-series-2); font-weight: 500; }
+.fail { color: var(--viz-series-1); font-weight: 500; }
+.official { background: color-mix(in srgb, var(--viz-series-3) 9%, transparent); }
+.table-responsive { overflow-x: auto; }
+@media (max-width: 560px) { main { padding: 22px 12px 44px; } th, td { padding: 7px 5px; font-size: 12px; } .bar-svg text { font-size: 11px; } }
+</style>
+</head><body>
+<main id="three-arm-benchmark" aria-labelledby="benchmark-title">
+  <header class="hero">
+    <p class="eyebrow">LIVE CODEX · REAL GITHUB TASK · THREE ARM</p>
+    <h1 id="benchmark-title">Fixture closure changes when common parent directories are collected repeatedly</h1>
+    <p class="meta-line"><a href="https://github.com/pytest-dev/pytest/issues/14635">Issue</a> · <a href="https://github.com/pytest-dev/pytest.git">repository</a> · base <code>eb79044cea1c2c7b6e58ebcce17c55da871fef6c</code></p>
+    <p class="meta-line">gpt-5.6-luna · effort max · execution parallel</p>
+    <div class="outcome" aria-live="polite"><strong>3/3 accepted</strong><span>3/3 functional</span><span>same base SHA</span><span>paired + validated retry</span></div>
+  </header>
+
+  <section aria-labelledby="tokens-title">
+    <h2 id="tokens-title">Raw token telemetry</h2>
+    <div class="chart-wrap"><div id="token-chart" class="chart" role="img" aria-label="Grouped bars comparing raw token counts"></div></div>
+  </section>
+
+  <section aria-labelledby="runtime-title">
+    <h2 id="runtime-title">Runtime, cost and footprint</h2>
+    <div class="chart-wrap"><div id="runtime-chart" class="chart" role="img" aria-label="Grouped bars comparing runtime and cost"></div></div>
+  </section>
+
+  <section aria-labelledby="comparison-title">
+    <h2 id="comparison-title">Change versus baseline</h2>
+    <div class="chart-wrap"><div id="delta-chart" class="chart" role="img" aria-label="Percent change versus baseline"></div></div>
+  </section>
+
+  <section aria-labelledby="raw-title">
+    <h2 id="raw-title">Exact values</h2>
+    <div class="table-responsive"><table><thead><tr><th>Metric</th><th>Baseline</th><th>Astra Ultra</th><th>Lattice</th></tr></thead><tbody id="raw-table"></tbody></table></div>
+    <p class="note">Input includes cached input; fresh input is input minus cached. Reasoning output is a subset of output tokens. Lattice tool calls are not emitted by its own runtime and remain n/a.</p>
+  </section>
+
+  <section aria-labelledby="gate-title">
+    <h2 id="gate-title">Correctness gate</h2>
+    <div class="table-responsive"><table><thead><tr><th>Criterion</th><th>Baseline</th><th>Astra Ultra</th><th>Lattice</th></tr></thead><tbody id="gate-table"></tbody></table></div>
+  </section>
+
+  <section aria-labelledby="history-title">
+    <h2 id="history-title">Lattice robustness history</h2>
+    <p class="note">Previous attempts are retained to show which failures were fixed; only the official three-arm run is used for the comparison above.</p>
+    <div class="table-responsive"><table><thead><tr><th>Attempt</th><th>Internal</th><th>Accepted</th><th>Elapsed</th><th>Input</th><th>Faults</th><th>Failure</th></tr></thead><tbody id="history-table"></tbody></table></div>
+  </section>
+</main>
+<script>
+(() => {
+  const data = {"meta":{"title":"Fixture closure changes when common parent directories are collected repeatedly","repository":"https://github.com/pytest-dev/pytest.git","issue":"https://github.com/pytest-dev/pytest/issues/14635","base_sha":"eb79044cea1c2c7b6e58ebcce17c55da871fef6c","model":"gpt-5.6-luna","effort":"max","execution_mode":"parallel","artifact_dir":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure"},"metrics":{"baseline":{"input":4110495,"cached":3973376,"fresh":137119,"output":33598,"reasoning":21270,"cost":0.27426,"elapsed":807.94,"tests_elapsed":5.11,"acceptance_elapsed":10.57,"events":146,"turns":1,"tool_calls":124,"files":3,"added":135,"deleted":0,"page_faults":null,"recovery_attempts":null,"loaded_pages":null,"initial_context_tokens":null,"worker_turns":null,"protocol_repairs":null},"astra-ultra":{"input":173161,"cached":26112,"fresh":147049,"output":78113,"reasoning":75785,"cost":0.12367,"elapsed":1446.05,"tests_elapsed":2.81,"acceptance_elapsed":12.88,"events":19,"turns":4,"tool_calls":0,"files":2,"added":110,"deleted":0,"page_faults":2,"recovery_attempts":1,"loaded_pages":5,"initial_context_tokens":1242,"worker_turns":4,"protocol_repairs":null},"lattice":{"input":2254889,"cached":2089216,"fresh":165673,"output":15324,"reasoning":9588,"cost":0.17742,"elapsed":437.5,"tests_elapsed":5.1,"acceptance_elapsed":10.59,"events":52,"turns":5,"tool_calls":null,"files":2,"added":144,"deleted":0,"page_faults":4,"recovery_attempts":null,"loaded_pages":6,"initial_context_tokens":39997,"worker_turns":5,"protocol_repairs":0}},"comparisons":{"astra-ultra":{"input_token_change_pct":-95.79,"cached_input_change_pct":-99.34,"output_token_change_pct":132.49,"reasoning_token_change_pct":256.3,"latency_change_pct":78.98,"test_latency_change_pct":-45.01,"cost_change_pct":-54.91,"tool_call_change_pct":-100.0,"speedup_factor":0.559},"lattice":{"input_token_change_pct":-45.14,"cached_input_change_pct":-47.42,"output_token_change_pct":-54.39,"reasoning_token_change_pct":-54.92,"latency_change_pct":-45.85,"test_latency_change_pct":-0.2,"cost_change_pct":-35.31,"tool_call_change_pct":null,"speedup_factor":1.847}},"results":{"baseline":{"status":"accepted","internal_status":null,"agent_success":true,"accepted":true,"functional_acceptance":true,"implementation_complete":true,"tests_green":true,"acceptance_green":true,"test_count":2,"changed_files":["changelog/14635.bugfix.rst","src/_pytest/main.py","testing/test_conftest.py"],"failure_reasons":[]},"astra-ultra":{"status":"accepted","internal_status":null,"agent_success":true,"accepted":true,"functional_acceptance":true,"implementation_complete":true,"tests_green":true,"acceptance_green":true,"test_count":2,"changed_files":["src/_pytest/main.py","testing/test_conftest.py"],"failure_reasons":[]},"lattice":{"status":"accepted","internal_status":"passed","agent_success":true,"accepted":true,"functional_acceptance":true,"implementation_complete":true,"tests_green":true,"acceptance_green":true,"test_count":2,"changed_files":["src/_pytest/main.py","testing/test_conftest.py"],"failure_reasons":[]}},"attempts":[{"artifact":"1788902266549912900-pytest-14635-fixture-closure","path":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788902266549912900-pytest-14635-fixture-closure\\real_task_results.json","official":false,"status":"failed","internal_status":"failed","accepted":false,"agent_success":false,"elapsed_seconds":343.44,"input_tokens":678864,"page_faults":3,"worker_turns":4,"failure_reasons":["agent_failed","external_acceptance_failed","no_tests_changed"]},{"artifact":"1788905085063758800-pytest-14635-fixture-closure","path":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788905085063758800-pytest-14635-fixture-closure\\real_task_results.json","official":false,"status":"failed","internal_status":"failed","accepted":false,"agent_success":false,"elapsed_seconds":423.48,"input_tokens":932566,"page_faults":2,"worker_turns":4,"failure_reasons":["agent_failed","targeted_suite_failed"]},{"artifact":"1788907867209051800-pytest-14635-fixture-closure","path":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788907867209051800-pytest-14635-fixture-closure\\real_task_results.json","official":false,"status":"failed","internal_status":"failed","accepted":false,"agent_success":false,"elapsed_seconds":504.65,"input_tokens":1940956,"page_faults":7,"worker_turns":8,"failure_reasons":["agent_failed","targeted_suite_failed"]},{"artifact":"1788910170419117700-pytest-14635-fixture-closure","path":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788910170419117700-pytest-14635-fixture-closure\\real_task_results.json","official":false,"status":"accepted","internal_status":"passed","accepted":true,"agent_success":true,"elapsed_seconds":493.82,"input_tokens":954302,"page_faults":2,"worker_turns":3,"failure_reasons":[]},{"artifact":"1788912985871866300-pytest-14635-fixture-closure","path":"C:\\ANTIGRAVITY WORKS\\astra-ultra\\.local\\real-task-artifacts\\1788912985871866300-pytest-14635-fixture-closure\\real_task_results.json","official":true,"status":"accepted","internal_status":"passed","accepted":true,"agent_success":true,"elapsed_seconds":437.5,"input_tokens":2254889,"page_faults":4,"worker_turns":5,"failure_reasons":[]}]};
+  const order = ['baseline', 'astra-ultra', 'lattice'];
+  const labels = {baseline: 'Baseline', 'astra-ultra': 'Astra Ultra', lattice: 'Lattice'};
+  const colors = {baseline: 'var(--viz-series-1)', 'astra-ultra': 'var(--viz-series-2)', lattice: 'var(--viz-series-3)'};
+  const nf = new Intl.NumberFormat('en-US');
+  const money = value => value == null ? 'n/a' : '$' + Number(value).toFixed(5);
+  const value = (key, variant) => data.metrics[variant][key];
+  const format = (key, raw) => {
+    if (raw == null) return 'n/a';
+    if (key === 'cost') return money(raw);
+    if (key.endsWith('elapsed') || key === 'elapsed') return Number(raw).toFixed(2) + ' s';
+    return nf.format(Math.round(raw));
+  };
+  const esc = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function drawBars(id, title, rows) {
+    const host = document.getElementById(id);
+    const width = Math.max(320, host.clientWidth || 736);
+    const left = width < 520 ? 128 : 178;
+    const right = 92;
+    const rowHeight = 58;
+    const height = rows.length * rowHeight + 38;
+    const allValues = rows.flatMap(row => order.map(variant => Number(row.values[variant]) || 0));
+    const diverging = Math.min(...allValues) < 0 && Math.max(...allValues) > 0;
+    const min = diverging ? Math.min(0, ...allValues) : 0;
+    const max = diverging ? Math.max(0, ...allValues) : Math.max(1, ...allValues);
+    const domain = Math.max(1, max - min);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.setAttribute('class', 'bar-svg');
+    svg.setAttribute('role', 'img');
+    const titleNode = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    titleNode.textContent = title;
+    svg.appendChild(titleNode);
+    const axis = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    axis.setAttribute('class', 'axis-title'); axis.setAttribute('data-axis', 'x');
+    axis.setAttribute('x', left); axis.setAttribute('y', height - 4); axis.textContent = rows[0].axisLabel || 'absolute value'; svg.appendChild(axis);
+    if (diverging) {
+      const zero = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const zeroX = left + (-min / domain) * (width - left - right);
+      zero.setAttribute('x1', zeroX); zero.setAttribute('x2', zeroX); zero.setAttribute('y1', 0); zero.setAttribute('y2', height - 14); zero.setAttribute('stroke', 'var(--border)'); zero.setAttribute('stroke-width', '1'); svg.appendChild(zero);
+    }
+    rows.forEach((row, index) => {
+      const y = index * rowHeight + 8;
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('class', 'row-label'); label.setAttribute('x', 0); label.setAttribute('y', y + 16); label.textContent = row.label; svg.appendChild(label);
+      order.forEach((variant, series) => {
+        const raw = row.values[variant];
+        const barY = y + series * 14;
+        const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const zeroX = left + (-min / domain) * (width - left - right);
+        const barWidth = raw == null ? 0 : Math.max(1, Math.abs(Number(raw)) / domain * (width - left - right));
+        bar.setAttribute('x', diverging && raw != null && Number(raw) < 0 ? zeroX - barWidth : diverging ? zeroX : left); bar.setAttribute('y', barY); bar.setAttribute('height', 10);
+        bar.setAttribute('width', barWidth);
+        bar.setAttribute('fill', colors[variant]); bar.setAttribute('rx', 2);
+        bar.setAttribute('data-tooltip', `${labels[variant]} · ${row.label}: ${row.format ? row.format(raw) : format(row.key, raw)}`);
+        svg.appendChild(bar);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'bar-value'); text.setAttribute('x', width - right + 6); text.setAttribute('y', barY + 9); text.textContent = raw == null ? 'n/a' : (row.format ? row.format(raw) : format(row.key, raw)); svg.appendChild(text);
+      });
+    });
+    host.replaceChildren(svg);
+  }
+
+  const tokenRows = [
+    {key:'input', label:'Input', values:{}}, {key:'cached', label:'Cached input', values:{}},
+    {key:'fresh', label:'Fresh input', values:{}}, {key:'output', label:'Output', values:{}},
+    {key:'reasoning', label:'Reasoning output', values:{}}
+  ];
+  const runtimeRows = [
+    {key:'elapsed', label:'Agent wall time', values:{}}, {key:'tests_elapsed', label:'Target tests', values:{}},
+    {key:'acceptance_elapsed', label:'External acceptance', values:{}}, {key:'cost', label:'Estimated cost', values:{}, format: money},
+    {key:'files', label:'Files changed', values:{}}, {key:'added', label:'Lines added', values:{}}
+  ];
+  [...tokenRows, ...runtimeRows].forEach(row => order.forEach(variant => row.values[variant] = value(row.key, variant)));
+  drawBars('token-chart', 'Raw token counts', tokenRows);
+  drawBars('runtime-chart', 'Runtime, cost and diff footprint', runtimeRows);
+
+  const comparisonRows = [
+    ['input_token_change_pct', 'Input tokens'], ['cached_input_change_pct', 'Cached input'],
+    ['output_token_change_pct', 'Output tokens'], ['reasoning_token_change_pct', 'Reasoning'],
+    ['latency_change_pct', 'Agent wall time'], ['test_latency_change_pct', 'Target tests'],
+    ['cost_change_pct', 'Estimated cost'], ['tool_call_change_pct', 'Tool calls']
+  ];
+  const deltaRows = comparisonRows.map(([key, label]) => {
+    const row = {key, label, axisLabel: 'change vs baseline (%)', values: {baseline: 0, 'astra-ultra': data.comparisons['astra-ultra']?.[key], lattice: data.comparisons.lattice?.[key]}, format: raw => raw == null ? 'n/a' : Number(raw).toFixed(2) + '%'};
+    return row;
+  });
+  drawBars('delta-chart', 'Percent change versus baseline', deltaRows);
+
+  const rawRows = [
+    ['input','Input tokens'], ['cached','Cached input'], ['fresh','Fresh input'], ['output','Output tokens'], ['reasoning','Reasoning output'],
+    ['cost','Estimated cost'], ['elapsed','Agent wall time'], ['tests_elapsed','Target test time'], ['acceptance_elapsed','Acceptance time'],
+    ['events','JSONL/events'], ['turns','Worker/model turns'], ['tool_calls','Tool calls'], ['page_faults','Context page faults'], ['recovery_attempts','Recovery attempts'], ['loaded_pages','Loaded pages'],
+    ['initial_context_tokens','Initial context estimate'], ['files','Files changed'], ['added','Lines added'], ['deleted','Lines deleted']
+  ];
+  document.getElementById('raw-table').innerHTML = rawRows.map(([key,label]) => `<tr><th>${esc(label)}</th>${order.map(variant => `<td>${esc(format(key, value(key, variant)))}</td>`).join('')}</tr>`).join('');
+
+  const criteria = [
+    ['agent_success','Agent completed'], ['implementation_complete','Implementation complete'], ['tests_green','Targeted tests green'],
+    ['acceptance_green','External acceptance green'], ['functional_acceptance','Functional acceptance'], ['changed_files','Changed files']
+  ];
+  document.getElementById('gate-table').innerHTML = criteria.map(([key,label]) => `<tr><th>${esc(label)}</th>${order.map(variant => { const item=data.results[variant]; const raw=item[key]; const pass=key==='changed_files' ? raw.length + ' files' : (raw ? 'PASS' : 'FAIL'); return `<td class="${raw ? 'pass' : 'fail'}">${esc(pass)}</td>`; }).join('')}</tr>`).join('');
+
+  const attempts = [...data.attempts].reverse();
+  document.getElementById('history-table').innerHTML = attempts.map(item => `<tr class="${item.official ? 'official' : ''}"><th>${esc(item.artifact)}${item.official ? ' · official' : ''}</th><td>${esc(item.internal_status || item.status || 'n/a')}</td><td class="${item.accepted ? 'pass' : 'fail'}">${item.accepted ? 'PASS' : 'FAIL'}</td><td>${item.elapsed_seconds == null ? 'n/a' : Number(item.elapsed_seconds).toFixed(1) + ' s'}</td><td>${item.input_tokens == null ? 'n/a' : nf.format(item.input_tokens)}</td><td>${item.page_faults == null ? 'n/a' : item.page_faults}</td><td>${esc((item.failure_reasons || []).join(', ') || '—')}</td></tr>`).join('');
+
+  const redraw = () => { drawBars('token-chart','Raw token counts',tokenRows); drawBars('runtime-chart','Runtime, cost and diff footprint',runtimeRows); drawBars('delta-chart','Percent change versus baseline',deltaRows); };
+  new ResizeObserver(redraw).observe(document.getElementById('three-arm-benchmark'));
+})();
+</script>
+</body></html>

@@ -8,12 +8,15 @@
       "category": "distributed_systems",
       "difficulty": "EXTREME",
       "fixture_path": "heavy_workloads/raft_consensus/logs/raft_cluster_trace.log",
+      "packet_focus": "RAFT_INVARIANT_VIOLATION",
+      "packet_max_chars": 6000,
+      "packet_context": 3,
       "total_log_lines": 35004,
       "expected_error_line": 34503,
       "target_model": "Luna-5.6 (High Effort) / o1 / o3-mini",
       "description": "Isolate the exact term, candidate ID, and log index where the Raft Election Safety Invariant broke in a 35,000-line concurrent trace without dumping the log into context.",
-      "prompt_unoptimized": "Analyze heavy_workloads/raft_consensus/logs/raft_cluster_trace.log and determine the exact term, candidate ID, and log index where the Raft Election Safety invariant was violated. Provide the line number and conflicting leaders.",
-      "prompt_optimized": "Use $astra-ultra. Apply bounded log slicing and error filtering on heavy_workloads/raft_consensus/logs/raft_cluster_trace.log to isolate the Raft Election Safety invariant violation. Report the term, candidate ID, log index, line number, and conflicting leaders in under 10 lines.",
+      "prompt_unoptimized": "Analyze benchmarks/heavy_workloads/raft_consensus/logs/raft_cluster_trace.log and determine the exact term, candidate ID, and log index where the Raft Election Safety invariant was violated. Provide the line number and conflicting leaders.",
+      "prompt_optimized": "Use $astra-ultra. Apply bounded log slicing and error filtering on benchmarks/heavy_workloads/raft_consensus/logs/raft_cluster_trace.log to isolate the Raft Election Safety invariant violation. Report the term, candidate ID, log index, line number, and conflicting leaders in under 10 lines.",
       "expected_keywords": ["34503", "Election Safety", "term", "leader"]
     },
     {
@@ -22,10 +25,15 @@
       "category": "storage_engines",
       "difficulty": "HARD",
       "codebase_path": "heavy_workloads/mvcc_storage/",
+      "packet_max_chars": 10000,
+      "packet_focuses": {
+        "transaction_manager.py": ["def abort"],
+        "mvcc_engine.py": ["def rollback_versions"]
+      },
       "target_model": "Terra (Medium Effort) / Luna-5.6 / o1",
       "description": "Identify the missing version unlinking race condition in TransactionManager.abort causing dirty reads across concurrent checkpoints.",
-      "prompt_unoptimized": "Inspect the MVCC storage engine implementation in heavy_workloads/mvcc_storage/ and identify the missing version unlinking race condition in TransactionManager.abort that causes dirty reads across concurrent checkpoints.",
-      "prompt_optimized": "Use $astra-ultra. Use AST skeletons and bounded slices to inspect heavy_workloads/mvcc_storage/ and locate the missing version unlinking bug in TransactionManager.abort. Output the exact file, method, line range, and race condition explanation.",
+      "prompt_unoptimized": "Inspect the MVCC storage engine implementation in benchmarks/heavy_workloads/mvcc_storage/ and identify the missing version unlinking race condition in TransactionManager.abort that causes dirty reads across concurrent checkpoints.",
+      "prompt_optimized": "Use $astra-ultra. Use AST skeletons and bounded slices to inspect benchmarks/heavy_workloads/mvcc_storage/ and locate the missing version unlinking bug in TransactionManager.abort. Output the exact file, method, line range, and race condition explanation.",
       "expected_keywords": ["TransactionManager", "abort", "version", "dirty read"]
     }
   ]

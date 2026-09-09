@@ -106,11 +106,18 @@ class RepoMapGraph:
         self.files: List[Path] = []
         self.definitions_by_file: Dict[str, List[Dict[str, Any]]] = {}
         self.references_by_file: Dict[str, Set[str]] = {}
+        # Reused by the deterministic index so a worktree is not read twice.
+        self.raw_contents: Dict[str, bytes] = {}
         self.all_symbols: Dict[str, List[str]] = {}
         self.adjacency: Dict[str, Set[str]] = {}
 
     def scan(self) -> None:
         self.files = []
+        self.definitions_by_file = {}
+        self.references_by_file = {}
+        self.raw_contents = {}
+        self.all_symbols = {}
+        self.adjacency = {}
         for root, dirs, filenames in os.walk(self.root_dir):
             dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS and not d.startswith(".")]
             for filename in filenames:
@@ -119,12 +126,17 @@ class RepoMapGraph:
                     full_path = Path(root) / filename
                     self.files.append(full_path)
 
+        self.files.sort(key=lambda path: path.as_posix())
+
         for filepath in self.files:
             rel_path = str(filepath.relative_to(self.root_dir)).replace("\\", "/")
             try:
-                content = filepath.read_text(encoding="utf-8-sig")
+                raw_content = filepath.read_bytes()
+                content = raw_content.decode("utf-8-sig", errors="replace")
             except Exception:
                 continue
+
+            self.raw_contents[rel_path] = raw_content
 
             if filepath.suffix.lower() == ".py":
                 defs, refs = extract_python_symbols(filepath, content)
