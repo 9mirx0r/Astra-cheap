@@ -95,7 +95,7 @@ also combines bounded context, provider protocols, transactional patching,
 verification, and telemetry. The latest three-arm live run accepted all three
 solutions, so the meaningful difference was efficiency and latency:
 
-| Metric | Astra-Ultra | Lattice | Current winner |
+| Metric | Astra-Ultra | Lattice | Winner on this task |
 | :--- | ---: | ---: | :--- |
 | Total tokens | **251,274** | 2,270,213 | Astra-Ultra |
 | Estimated cost | **US$0.12367** | US$0.17742 | Astra-Ultra |
@@ -103,10 +103,9 @@ solutions, so the meaningful difference was efficiency and latency:
 | Reasoning tokens | 75,785 | **9,588** | Lattice |
 | Functional acceptance | yes | yes | tie |
 
-The current overall ranking for the project's primary objective is Astra-Ultra:
-it is the least expensive and most token-efficient while preserving the same
-acceptance result. Lattice is the speed leader on this task, not the overall
-efficiency leader.
+For this task, Astra-Ultra had the least expensive and most token-efficient
+profile while preserving the same acceptance result. Lattice was the speed
+leader. This is a trial-level comparison, not a general leaderboard.
 
 The architectural reason for the latency gap is concrete. Lattice starts a
 persistent Codex SDK thread, front-loads a larger initial context packet, and

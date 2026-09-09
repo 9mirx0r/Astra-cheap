@@ -101,7 +101,7 @@ The result was a useful tradeoff:
 - Astra's first rejected patch caused a recovery turn; that turn alone took
   approximately 555 seconds and 29,006 reasoning tokens.
 
-The current ranking is therefore:
+The ranking for this trial is therefore:
 
 1. **Astra-Ultra** for overall efficiency, cost, and token economy with verified
    correctness;

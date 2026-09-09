@@ -88,9 +88,9 @@ observability come before optimization claims.
 ## Current evidence
 
 The runtime currently has a passing deterministic suite, compile validation,
-skill validation, and a three-arm real-task artifact in which all three arms
-passed the focused tests and the independent acceptance oracle. Astra-Ultra is
-the current overall efficiency leader in that run; Lattice is the latency
-reference. The result is useful for engineering decisions, but it is still one
-task and one trial per arm, so the next optimization gate is a repeated,
-randomized suite.
+skill validation, scoped Ruff/mypy gates, and a three-arm real-task artifact in
+which all three arms passed the focused tests and the independent acceptance
+oracle. Astra-Ultra had the lowest measured token and cost profile in that
+trial; Lattice was the latency reference. The result is useful for engineering
+decisions, but it is still one task and one trial per arm, so the next
+optimization gate is a repeated, randomized suite.

@@ -121,10 +121,10 @@ unoptimized baseline and Lattice, while the current worker was slower than
 Lattice. Lattice is not a cheaper alternative in this run: Astra-Ultra cost
 US$0.12367 versus Lattice's US$0.17742.
 
-The practical ranking from the latest evidence is:
+The practical ranking from this trial is:
 
-1. **Astra-Ultra:** best overall efficiency and lowest cost, with correctness
-   preserved.
+1. **Astra-Ultra:** best measured efficiency profile and lowest cost, with
+   correctness preserved.
 2. **Lattice:** best raw latency, but with substantially higher input volume
    and cost than Astra-Ultra.
 3. **Baseline:** useful reference arm, but worst on tokens and cost.
