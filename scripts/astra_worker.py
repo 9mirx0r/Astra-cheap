@@ -40,7 +40,8 @@ class ScriptedWorker:
 
 
 def _tool_event(data: Mapping[str, Any]) -> bool:
-    item = data.get("item") if isinstance(data.get("item"), dict) else {}
+    item_value = data.get("item")
+    item: dict[str, Any] = item_value if isinstance(item_value, dict) else {}
     haystack = " ".join(str(data.get(key, "")) for key in ("type", "name", "event"))
     haystack += " " + " ".join(str(item.get(key, "")) for key in ("type", "name"))
     return any(marker in haystack.lower() for marker in ("tool_call", "function_call", "command_execution", "shell_command"))

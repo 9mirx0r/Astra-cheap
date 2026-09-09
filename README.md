@@ -255,9 +255,9 @@ python quick_validate.py --skill .
 ```
 
 CI also runs Ruff on the public CLI utilities, active runtime, and benchmark
-harness. The older compatibility utilities remain intentionally outside that
-first gate; they are tracked as migration work rather than silently treated as
-production-clean.
+harness, plus mypy on the runtime contracts. The older compatibility utilities
+remain intentionally outside that first gate; they are tracked as migration
+work rather than silently treated as production-clean.
 
 ---
 
