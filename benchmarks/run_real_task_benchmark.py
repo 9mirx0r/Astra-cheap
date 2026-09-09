@@ -32,7 +32,12 @@ from benchmark_astra import execute_astra_runtime_agent  # noqa: E402
 from benchmark_codex import execute_agent  # noqa: E402
 from benchmark_evaluation import evaluate_agent  # noqa: E402
 from benchmark_lattice import execute_lattice_agent  # noqa: E402
-from real_task_catalog import RealTask, available_tasks  # noqa: E402
+from real_task_catalog import (  # noqa: E402
+    PYDANTIC_REVIEW_SLUG as TASK_SLUG,
+    RealTask,
+    available_tasks,
+    get_real_task,
+)
 from real_task_evidence import build_evidence_packet  # noqa: E402
 
 
@@ -45,149 +50,7 @@ def _log(message: str) -> None:
         print(message, flush=True)
 
 
-REPO_URL = "https://github.com/pydantic/pydantic-ai.git"
-ISSUE_URL = "https://github.com/pydantic/pydantic-ai/issues/4723"
-ISSUE_TITLE = "New end_strategy='review' — let the model review and patch output before finalizing"
 MODEL = "gpt-5.6-luna"
-TASK_SLUG = "pydantic-ai-4723-review-output"
-DEFAULT_TEST_COMMAND = [
-    "uv",
-    "run",
-    "--frozen",
-    "pytest",
-    "tests/test_agent.py",
-    "tests/test_agent_output_schemas.py",
-    "-q",
-    "--disable-warnings",
-    "--maxfail=5",
-    "-k",
-    "not test_parallel_mcp_calls",
-]
-
-
-TASK_STATEMENT = f"""# Real GitHub task
-
-- Repository: {REPO_URL}
-- Issue: {ISSUE_URL}
-- Title: {ISSUE_TITLE}
-
-## Problem
-
-Pydantic AI's output tool is terminal today: once `final_result` validates, the
-run ends and the model cannot inspect or correct its own structured extraction.
-This is a problem for forms, invoices and other extraction tasks where a schema
-can validate while a field is still semantically wrong.
-
-## Requested behavior
-
-Add an opt-in `end_strategy='review'` mode.  When an output tool produces a
-valid result, the framework should store it and return the serialized result to
-the model as a non-terminal tool result.  The model must be able to either:
-
-1. call an automatically generated JSON Patch RFC 6902 tool to apply a targeted
-   patch to the stored result; the patched value must be revalidated and the
-   updated value returned to the model; and
-2. call a confirmation tool (the exact public name may follow project
-   conventions) to finalize the validated current result.
-
-Invalid output should retain the existing retry behavior. Existing strategies
-(`early`, `graceful`, and `exhaustive`) must keep their behavior and the new
-mode must remain opt-in and type-safe.
-
-## Acceptance contract
-
-- `Agent(..., end_strategy='review')` is accepted without changing the default.
-- A valid output does not terminate the first model turn in review mode.
-- A review-only flow can confirm a valid result and returns it to the caller.
-- A patch flow can replace a nested scalar using an RFC 6902 operation, then
-  confirm and return the patched, revalidated output.
-- Invalid patches or invalid final output are rejected through the framework's
-  existing retry/error path.
-- Relevant tests and documentation are added, and the existing agent/output
-  test suites remain green.
-
-## Shared implementation plan
-
-Use this order for both benchmark variants so the baseline is not forced to
-rediscover the acceptance path from scratch:
-
-1. Extend the public/type surface for the opt-in strategy while preserving all
-   existing strategies.
-2. Trace the final-output path through the agent graph and tool execution layer.
-3. Implement the review state and generated confirmation/JSON-Patch tools at
-   the narrowest existing output-tool seam.
-4. Revalidate patched output through the existing output processor before
-   returning it to the model.
-5. Add focused confirm, patch, invalid-patch, regression, and documentation
-   coverage; then run the targeted suite.
-
-Prioritize a working vertical slice early. Do not spend the entire budget on
-repository archaeology or broad refactoring.
-
-Do not commit or push. Work only in the provided detached worktree.
-"""
-
-
-def _legacy_task() -> RealTask:
-    """Keep the original review task available for report rechecks and reruns."""
-    return RealTask(
-        slug=TASK_SLUG,
-        repository=REPO_URL,
-        issue=ISSUE_URL,
-        title=ISSUE_TITLE,
-        target_directory="pydantic-ai",
-        statement=TASK_STATEMENT,
-        test_command=tuple(DEFAULT_TEST_COMMAND),
-        evidence_files=EVIDENCE_FILES,
-        acceptance_code="",
-        required_surfaces=(
-            (
-                "review_strategy_surface",
-                r"end_strategy.{0,100}review|review.{0,100}end_strategy",
-            ),
-            ("patch_surface", r"patch_result|json.?patch|JsonPatch"),
-            ("confirmation_surface", r"confirm_result|confirmation"),
-        ),
-    )
-
-
-def get_real_task(slug: str = TASK_SLUG) -> RealTask:
-    """Resolve a task slug without allowing arbitrary code or paths from CLI input."""
-    if slug == TASK_SLUG:
-        return _legacy_task()
-    task = available_tasks().get(slug)
-    if task is None:
-        available = ", ".join(sorted({TASK_SLUG, *available_tasks()}))
-        raise ValueError(f"unknown real-task benchmark {slug!r}; choose one of: {available}")
-    return task
-
-
-EVIDENCE_FILES: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("AGENTS.md", ("Requirements of all contributions", "Development workflow", "Pydantic AI is meant")),
-    ("pydantic_ai_slim/pydantic_ai/AGENTS.md", ("API Design", "Type System", "Testing")),
-    ("tests/AGENTS.md", ("Testing", "Snapshot", "pytest")),
-    (
-        "pydantic_ai_slim/pydantic_ai/_agent_graph.py",
-        ("EndStrategy", "def _handle_tool_calls", "def _handle_final_result", "process_tool_calls"),
-    ),
-    (
-        "pydantic_ai_slim/pydantic_ai/_output.py",
-        ("class OutputSchema", "class OutputToolset", "process_tool_call", "OutputToolset.for_run_step"),
-    ),
-    (
-        "pydantic_ai_slim/pydantic_ai/output.py",
-        ("class ToolOutput", "OutputContext", "OutputSpec"),
-    ),
-    (
-        "pydantic_ai_slim/pydantic_ai/result.py",
-        ("class FinalResult", "EndRun"),
-    ),
-    ("tests/test_agent.py", ("test_early_strategy", "test_graceful_strategy", "test_exhaustive_strategy")),
-    ("tests/test_agent_output_schemas.py", ("output", "schema")),
-    ("docs/agent.md", ("end_strategy", "output_type")),
-)
-
-
 def _run(cmd: list[str], cwd: Path, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         cmd,

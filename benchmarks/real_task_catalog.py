@@ -32,6 +32,130 @@ class RealTask:
     astra_max_recoveries: int = 3
 
 
+PYDANTIC_REVIEW_REPOSITORY = "https://github.com/pydantic/pydantic-ai.git"
+PYDANTIC_REVIEW_ISSUE = "https://github.com/pydantic/pydantic-ai/issues/4723"
+PYDANTIC_REVIEW_TITLE = "New end_strategy='review' — let the model review and patch output before finalizing"
+PYDANTIC_REVIEW_SLUG = "pydantic-ai-4723-review-output"
+PYDANTIC_REVIEW_TEST_COMMAND = (
+    "uv",
+    "run",
+    "--frozen",
+    "pytest",
+    "tests/test_agent.py",
+    "tests/test_agent_output_schemas.py",
+    "-q",
+    "--disable-warnings",
+    "--maxfail=5",
+    "-k",
+    "not test_parallel_mcp_calls",
+)
+PYDANTIC_REVIEW_STATEMENT = f"""# Real GitHub task
+
+- Repository: {PYDANTIC_REVIEW_REPOSITORY}
+- Issue: {PYDANTIC_REVIEW_ISSUE}
+- Title: {PYDANTIC_REVIEW_TITLE}
+
+## Problem
+
+Pydantic AI's output tool is terminal today: once `final_result` validates, the
+run ends and the model cannot inspect or correct its own structured extraction.
+This is a problem for forms, invoices and other extraction tasks where a schema
+can validate while a field is still semantically wrong.
+
+## Requested behavior
+
+Add an opt-in `end_strategy='review'` mode.  When an output tool produces a
+valid result, the framework should store it and return the serialized result to
+the model as a non-terminal tool result.  The model must be able to either:
+
+1. call an automatically generated JSON Patch RFC 6902 tool to apply a targeted
+   patch to the stored result; the patched value must be revalidated and the
+   updated value returned to the model; and
+2. call a confirmation tool (the exact public name may follow project
+   conventions) to finalize the validated current result.
+
+Invalid output should retain the existing retry behavior. Existing strategies
+(`early`, `graceful`, and `exhaustive`) must keep their behavior and the new
+mode must remain opt-in and type-safe.
+
+## Acceptance contract
+
+- `Agent(..., end_strategy='review')` is accepted without changing the default.
+- A valid output does not terminate the first model turn in review mode.
+- A review-only flow can confirm a valid result and returns it to the caller.
+- A patch flow can replace a nested scalar using an RFC 6902 operation, then
+  confirm and return the patched, revalidated output.
+- Invalid patches or invalid final output are rejected through the framework's
+  existing retry/error path.
+- Relevant tests and documentation are added, and the existing agent/output
+  test suites remain green.
+
+## Shared implementation plan
+
+Use this order for both benchmark variants so the baseline is not forced to
+rediscover the acceptance path from scratch:
+
+1. Extend the public/type surface for the opt-in strategy while preserving all
+   existing strategies.
+2. Trace the final-output path through the agent graph and tool execution layer.
+3. Implement the review state and generated confirmation/JSON-Patch tools at
+   the narrowest existing output-tool seam.
+4. Revalidate patched output through the existing output processor before
+   returning it to the model.
+5. Add focused confirm, patch, invalid-patch, regression, and documentation
+   coverage; then run the targeted suite.
+
+Prioritize a working vertical slice early. Do not spend the entire budget on
+repository archaeology or broad refactoring.
+
+Do not commit or push. Work only in the provided detached worktree.
+"""
+PYDANTIC_REVIEW_EVIDENCE_FILES = (
+    ("AGENTS.md", ("Requirements of all contributions", "Development workflow", "Pydantic AI is meant")),
+    ("pydantic_ai_slim/pydantic_ai/AGENTS.md", ("API Design", "Type System", "Testing")),
+    ("tests/AGENTS.md", ("Testing", "Snapshot", "pytest")),
+    (
+        "pydantic_ai_slim/pydantic_ai/_agent_graph.py",
+        ("EndStrategy", "def _handle_tool_calls", "def _handle_final_result", "process_tool_calls"),
+    ),
+    (
+        "pydantic_ai_slim/pydantic_ai/_output.py",
+        ("class OutputSchema", "class OutputToolset", "process_tool_call", "OutputToolset.for_run_step"),
+    ),
+    (
+        "pydantic_ai_slim/pydantic_ai/output.py",
+        ("class ToolOutput", "OutputContext", "OutputSpec"),
+    ),
+    (
+        "pydantic_ai_slim/pydantic_ai/result.py",
+        ("class FinalResult", "EndRun"),
+    ),
+    ("tests/test_agent.py", ("test_early_strategy", "test_graceful_strategy", "test_exhaustive_strategy")),
+    ("tests/test_agent_output_schemas.py", ("output", "schema")),
+    ("docs/agent.md", ("end_strategy", "output_type")),
+)
+
+PYDANTIC_REVIEW_TASK = RealTask(
+    slug=PYDANTIC_REVIEW_SLUG,
+    repository=PYDANTIC_REVIEW_REPOSITORY,
+    issue=PYDANTIC_REVIEW_ISSUE,
+    title=PYDANTIC_REVIEW_TITLE,
+    target_directory="pydantic-ai",
+    statement=PYDANTIC_REVIEW_STATEMENT,
+    test_command=PYDANTIC_REVIEW_TEST_COMMAND,
+    evidence_files=PYDANTIC_REVIEW_EVIDENCE_FILES,
+    acceptance_code="",
+    required_surfaces=(
+        (
+            "review_strategy_surface",
+            r"end_strategy.{0,100}review|review.{0,100}end_strategy",
+        ),
+        ("patch_surface", r"patch_result|json.?patch|JsonPatch"),
+        ("confirmation_surface", r"confirm_result|confirmation"),
+    ),
+)
+
+
 PYDANTIC_GRAPH_7785_ACCEPTANCE = r'''from __future__ import annotations
 
 import asyncio
@@ -508,6 +632,17 @@ PYTEST_14635 = RealTask(
 def available_tasks() -> dict[str, RealTask]:
     """Return task definitions that are safe to use from the benchmark CLI."""
     return {
+        PYDANTIC_REVIEW_TASK.slug: PYDANTIC_REVIEW_TASK,
         PYDANTIC_GRAPH_7785.slug: PYDANTIC_GRAPH_7785,
         PYTEST_14635.slug: PYTEST_14635,
     }
+
+
+def get_real_task(slug: str = PYDANTIC_REVIEW_SLUG) -> RealTask:
+    """Resolve an allowlisted benchmark task without accepting paths or code."""
+
+    task = available_tasks().get(slug)
+    if task is None:
+        available = ", ".join(sorted(available_tasks()))
+        raise ValueError(f"unknown real-task benchmark {slug!r}; choose one of: {available}")
+    return task
