@@ -4,7 +4,7 @@
 
 # Astra-Ultra
 
-**Bounded context and verification runtime for OpenAI Codex.**  
+**Bounded context and verification runtime for OpenAI Codex.**
 Reduce repeated repository context while keeping correctness checks outside the
 agent and making the trade-offs visible.
 
