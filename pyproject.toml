@@ -39,6 +39,7 @@ py-modules = [
     "astra_context",
     "astra_worker",
     "astra_patch",
+    "astra_verification",
     "astra_runtime",
     "astra_cheap",
     "local_handoff",
