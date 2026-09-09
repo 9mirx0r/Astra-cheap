@@ -10,7 +10,7 @@ agent and making the trade-offs visible.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square)](https://www.python.org/)
-[![Tests: 114/114 Passing](https://img.shields.io/badge/Tests-114%2F114%20Passing-emerald.svg?style=flat-square)](#tests)
+[![Tests: 116/116 Passing](https://img.shields.io/badge/Tests-116%2F116%20Passing-emerald.svg?style=flat-square)](#tests)
 [![agentskills.io](https://img.shields.io/badge/Skill-agentskills.io%20Validated-blue.svg?style=flat-square)](#skill-standard)
 [![OpenAI Cache Aligned](https://img.shields.io/badge/OpenAI%20Cache-Aligned%20128--tok-purple.svg?style=flat-square)](#1-prefix-lock--128-token-cache-quantization)
 [![Models](https://img.shields.io/badge/Models-Luna%205.6%20%7C%20Terra%20%7C%20o1%20%7C%20o3--mini-orange.svg?style=flat-square)](#universal-model-support)
@@ -242,12 +242,12 @@ For the verifiable host runtime, see [`docs/ASTRA_RUNTIME.md`](docs/ASTRA_RUNTIM
 
 ## Verification & Tests
 
-Astra-Ultra includes a deterministic test suite with **114 unit tests** and strict skill validation:
+Astra-Ultra includes a deterministic test suite with **116 unit tests** and strict skill validation:
 
 ```bash
 # Run unit tests
 python -m unittest discover -s tests
-# Ran 114 tests - OK
+# Ran 116 tests - OK
 
 # Validate agentskills.io compliance
 python quick_validate.py --skill .
