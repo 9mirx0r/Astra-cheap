@@ -13,13 +13,12 @@ Filters terminal output and intercepts 'run_command' / shell tool calls:
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")

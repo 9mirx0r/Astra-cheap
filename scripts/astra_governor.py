@@ -12,12 +12,10 @@ Supports ALL models (GPT-4o, o1, o3-mini, o3, Luna 5.6, Terra) across ANY reason
 from __future__ import annotations
 
 import argparse
-import io
 import json
-import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -147,7 +145,7 @@ def main() -> int:
     cb_p.add_argument("--state-file", default=".local/circuit_breaker.json")
     cb_p.add_argument("--source-hash", required=True)
 
-    asym_p = subparsers.add_parser("asymmetric", help="Display formal Asymmetric 1-Turn Protocol for Luna 5.6 High")
+    subparsers.add_parser("asymmetric", help="Display formal Asymmetric 1-Turn Protocol for Luna 5.6 High")
 
     args = parser.parse_args()
 

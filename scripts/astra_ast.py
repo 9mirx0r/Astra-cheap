@@ -10,13 +10,11 @@ from __future__ import annotations
 
 import argparse
 import ast
-import io
 import json
-import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List
 
 # Ensure stdout uses UTF-8 to prevent Windows charmap errors
 if hasattr(sys.stdout, "reconfigure"):

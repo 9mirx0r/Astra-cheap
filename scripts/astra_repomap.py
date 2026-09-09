@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import argparse
 import ast
-import io
 import json
-import math
 import os
 import re
 from pathlib import Path

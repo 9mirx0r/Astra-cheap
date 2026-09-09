@@ -11,12 +11,11 @@ Exposes surgical AST and symbol navigation tools with minimal schema tax:
 
 from __future__ import annotations
 
-import io
 import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional, Tuple
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")

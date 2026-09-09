@@ -10,12 +10,10 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import io
 import json
-import os
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
