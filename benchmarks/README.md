@@ -15,6 +15,8 @@ runtime implementation under `scripts/`.
   Lattice arms from one immutable base commit.
 - `benchmark_evaluation.py` runs host-side tests and derives acceptance/diff
   metrics independently of the provider that produced a patch.
+- `benchmark_codex.py`, `benchmark_astra.py`, and `benchmark_lattice.py` own
+  the provider-specific process and telemetry mapping for each arm.
 - `benchmark_support.py` owns shared rate-card, packet, and telemetry helpers.
 - `process_support.py` owns the shared streaming/watchdog lifecycle for live
   provider processes.

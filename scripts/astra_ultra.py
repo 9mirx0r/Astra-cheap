@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Astra-Ultra: Unified CLI for OpenAI Codex Token Optimization.
+"""Astra-Ultra: unified CLI for bounded context and verified Codex work.
 
 Provides single-command access to all Astra-Ultra optimization engines:
   - map: Personalized PageRank RepoMap (<=1024 tokens)
@@ -13,8 +13,6 @@ Provides single-command access to all Astra-Ultra optimization engines:
 from __future__ import annotations
 
 import argparse
-import io
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -36,7 +34,7 @@ def run_subscript(script_name: str, args: list[str]) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="astra-ultra",
-        description="Astra-Ultra: High-Precision Token Economizer for OpenAI Codex (Universal Model & Effort Support)"
+        description="Astra-Ultra: bounded context and verification tools for OpenAI Codex"
     )
     subparsers = parser.add_subparsers(dest="tool", required=True)
 
