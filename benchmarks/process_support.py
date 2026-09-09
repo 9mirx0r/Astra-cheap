@@ -106,7 +106,7 @@ def run_streaming_process(
                     last_activity = now
                 if now >= started + timeout:
                     timed_out = True
-                    log(f"process timeout reached; terminating process tree")
+                    log("process timeout reached; terminating process tree")
                     terminate_process_tree(proc, cwd)
                     break
                 if now - last_activity >= inactivity_timeout:

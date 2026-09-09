@@ -6,7 +6,6 @@ from __future__ import annotations
 import hashlib
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Iterable, List, Sequence
 
 from astra_contracts import ContextPage, ContextRequest, TaskSpec

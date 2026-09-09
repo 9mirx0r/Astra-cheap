@@ -11,11 +11,10 @@ from __future__ import annotations
 
 import json
 import time
-from pathlib import Path
 from typing import Any, Mapping
 
 from astra_context import ContextBundle, ContextKernel
-from astra_contracts import RunResult, TaskSpec, Telemetry, WorkerResponse
+from astra_contracts import RunResult, TaskSpec, Telemetry
 from astra_index import RepositoryIndex
 from astra_patch import PatchError, WorkspaceTransaction, apply_patch, verify, verify_command
 from astra_worker import Worker, WorkerError
