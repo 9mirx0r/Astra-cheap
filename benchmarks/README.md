@@ -9,9 +9,15 @@ runtime implementation under `scripts/`.
 - `tasks/` contains task statements, acceptance contracts, and allowed test
   commands.
 - `real_task_catalog.py` registers tasks and builds their independent oracle.
+- `real_task_evidence.py` builds the bounded, hashed source packet supplied to
+  the treatment and baseline arms.
 - `run_real_task_benchmark.py` executes isolated Baseline, Astra-Ultra, and
   Lattice arms from one immutable base commit.
+- `benchmark_evaluation.py` runs host-side tests and derives acceptance/diff
+  metrics independently of the provider that produced a patch.
 - `benchmark_support.py` owns shared rate-card, packet, and telemetry helpers.
+- `process_support.py` owns the shared streaming/watchdog lifecycle for live
+  provider processes.
 - `build_*_report.py` turns machine-readable results into reports and dashboards.
 
 ## Evidence policy

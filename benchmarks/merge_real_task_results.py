@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "benchmarks"))
 
 from benchmark_support import parse_codex_telemetry  # noqa: E402
-from run_real_task_benchmark import _diff_stats, _git, _status_files  # noqa: E402
+from benchmark_evaluation import diff_stats, status_files  # noqa: E402
 
 
 BASE_SHA = "716f2ae4a1cb2650ce4ee58f702d1f60c3c93f8c"
@@ -67,8 +67,8 @@ def _timeout_result(artifact: Path, worktree: Path, variant: str) -> dict[str, A
     usage, response, observed = parse_codex_telemetry(stdout)
     test_path = artifact / f"{variant}.tests.filtered.txt"
     acceptance_path = artifact / f"{variant}.acceptance.stderr.txt"
-    changed_files = _status_files(worktree, BASE_SHA)
-    diff = _diff_stats(worktree, BASE_SHA, changed_files)
+    changed_files = status_files(worktree, BASE_SHA)
+    diff = diff_stats(worktree, BASE_SHA, changed_files)
     tests = {
         "command": [
             "uv",

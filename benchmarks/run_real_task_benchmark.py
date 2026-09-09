@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import hashlib
 import json
 import re
 import shutil
@@ -18,7 +17,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -32,8 +31,10 @@ sys.path.insert(0, str(ROOT / "benchmarks"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from benchmark_support import calculate_cost, parse_codex_telemetry  # noqa: E402
+from benchmark_evaluation import evaluate_agent  # noqa: E402
 from process_support import run_streaming_process  # noqa: E402
 from real_task_catalog import RealTask, available_tasks  # noqa: E402
+from real_task_evidence import build_evidence_packet  # noqa: E402
 from astra_contracts import TaskSpec  # noqa: E402
 from astra_runtime import AstraRuntime  # noqa: E402
 from astra_worker import CodexExecWorker  # noqa: E402
@@ -191,10 +192,6 @@ EVIDENCE_FILES: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def _run(cmd: list[str], cwd: Path, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         cmd,
@@ -212,90 +209,6 @@ def _git(cwd: Path, *args: str, timeout: int = 120) -> str:
     if result.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed:\n{result.stderr[-4000:]}")
     return result.stdout.strip()
-
-
-def _line_windows(path: Path, focuses: Iterable[str], context: int = 7, max_windows: int = 8) -> list[dict[str, Any]]:
-    lines = path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
-    windows: list[dict[str, Any]] = []
-    seen: set[tuple[int, int]] = set()
-    for focus in focuses:
-        for index, line in enumerate(lines):
-            if focus not in line:
-                continue
-            start = max(0, index - context)
-            end = min(len(lines), index + context + 1)
-            key = (start, end)
-            if key in seen:
-                continue
-            seen.add(key)
-            windows.append(
-                {
-                    "focus": focus,
-                    "start_line": start + 1,
-                    "end_line": end,
-                    "lines": [f"{number}: {lines[number - 1]}" for number in range(start + 1, end + 1)],
-                }
-            )
-            if len(windows) >= max_windows:
-                return windows
-    return windows
-
-
-def _skeleton(path: Path) -> str:
-    if path.suffix != ".py":
-        return ""
-    try:
-        from astra_ast import python_skeleton
-
-        return python_skeleton(path.read_text(encoding="utf-8-sig", errors="replace"))[:12000]
-    except Exception as exc:  # pragma: no cover - packet generation must remain fail-open
-        return f"skeleton unavailable: {exc}"
-
-
-def build_evidence_packet(
-    target: Path,
-    packet_path: Path,
-    task: RealTask | None = None,
-) -> dict[str, Any]:
-    """Build a bounded source map for Astra-Ultra without a model call."""
-    task = task or get_real_task()
-    files: list[dict[str, Any]] = []
-    total_chars = 0
-    for relative, focuses in task.evidence_files:
-        path = (target / relative).resolve()
-        if not path.is_file() or not path.is_relative_to(target.resolve()):
-            continue
-        windows = _line_windows(path, focuses, context=6 if path.suffix == ".py" else 3)
-        skeleton = _skeleton(path)
-        item = {
-            "source": relative,
-            "sha256": _sha256(path),
-            "line_count": len(path.read_text(encoding="utf-8-sig", errors="replace").splitlines()),
-            "skeleton": skeleton,
-            "windows": windows,
-            "authority": "untrusted_source_data",
-        }
-        encoded_size = len(json.dumps(item, ensure_ascii=False))
-        if total_chars + encoded_size > 65000:
-            item["skeleton"] = skeleton[:3000]
-            item["windows"] = windows[:3]
-            encoded_size = len(json.dumps(item, ensure_ascii=False))
-        if total_chars + encoded_size <= 80000:
-            files.append(item)
-            total_chars += encoded_size
-
-    packet = {
-        "schema": 1,
-        "kind": "real_task_evidence_packet",
-        "authority": "untrusted_source_data",
-        "repository": task.repository,
-        "issue": task.issue,
-        "base_sha": _git(target, "rev-parse", "HEAD"),
-        "files": files,
-        "bounded_characters": total_chars,
-    }
-    packet_path.write_text(json.dumps(packet, indent=2, ensure_ascii=False), encoding="utf-8")
-    return packet
 
 
 def make_acceptance_harness(path: Path, task: RealTask | None = None) -> None:
@@ -886,170 +799,6 @@ def execute_lattice_agent(
     return common
 
 
-def run_command(
-    cmd: list[str],
-    cwd: Path,
-    stdout_path: Path,
-    stderr_path: Path,
-    timeout: int,
-) -> dict[str, Any]:
-    started = time.perf_counter()
-    try:
-        completed = _run(cmd, cwd, timeout=timeout)
-        stdout_path.write_text(completed.stdout, encoding="utf-8")
-        stderr_path.write_text(completed.stderr, encoding="utf-8")
-        return {
-            "command": cmd,
-            "returncode": completed.returncode,
-            "elapsed_seconds": round(time.perf_counter() - started, 2),
-            "stdout_path": str(stdout_path.resolve()),
-            "stderr_path": str(stderr_path.resolve()),
-            "output_preview": (completed.stdout + "\n" + completed.stderr)[-3000:],
-        }
-    except subprocess.TimeoutExpired as exc:
-        stdout = _decode(exc.stdout)
-        stderr = _decode(exc.stderr)
-        stdout_path.write_text(stdout, encoding="utf-8")
-        stderr_path.write_text(stderr, encoding="utf-8")
-        return {
-            "command": cmd,
-            "returncode": None,
-            "elapsed_seconds": round(time.perf_counter() - started, 2),
-            "timeout": True,
-            "stdout_path": str(stdout_path.resolve()),
-            "stderr_path": str(stderr_path.resolve()),
-            "output_preview": (stdout + "\n" + stderr)[-3000:],
-        }
-
-
-def _status_files(worktree: Path, base_sha: str) -> list[str]:
-    names = _git(worktree, "diff", base_sha, "--name-only").splitlines()
-    status = _run(["git", "status", "--porcelain=v1", "-z", "-uall"], worktree, timeout=120)
-    for line in status.stdout.split("\0"):
-        if len(line) >= 3:
-            name = line[3:].strip()
-            if name and name not in names:
-                names.append(name)
-    return sorted(set(names))
-
-
-def _diff_stats(worktree: Path, base_sha: str, changed_files: list[str]) -> dict[str, Any]:
-    numstat = _git(worktree, "diff", base_sha, "--numstat").splitlines()
-    added = 0
-    deleted = 0
-    for line in numstat:
-        parts = line.split("\t")
-        if len(parts) >= 2:
-            added += int(parts[0]) if parts[0].isdigit() else 0
-            deleted += int(parts[1]) if parts[1].isdigit() else 0
-    for name in changed_files:
-        if not _git(worktree, "diff", base_sha, "--name-only").count(name):
-            path = worktree / name
-            if path.is_file():
-                added += len(path.read_text(encoding="utf-8-sig", errors="replace").splitlines())
-    check = _run(["git", "diff", base_sha, "--check"], worktree, timeout=120)
-    normalized_changed = [name.replace("\\", "/") for name in changed_files]
-    return {
-        "changed_files": changed_files,
-        "changed_file_count": len(changed_files),
-        "test_files_changed": [
-            name
-            for name, normalized in zip(changed_files, normalized_changed)
-            if normalized.startswith(("tests/", "testing/"))
-            or "/tests/" in normalized
-            or "/testing/" in normalized
-            or Path(normalized).name.startswith("test_")
-        ],
-        "lines_added": added,
-        "lines_deleted": deleted,
-        "diff_check_passed": check.returncode == 0,
-        "diff_check_output": check.stdout[-2000:] + check.stderr[-2000:],
-    }
-
-
-def evaluate_agent(
-    *,
-    variant: str,
-    result: dict[str, Any],
-    worktree: Path,
-    base_sha: str,
-    artifact_dir: Path,
-    acceptance_path: Path,
-    test_timeout: int,
-    task: RealTask | None = None,
-) -> dict[str, Any]:
-    task = task or get_real_task()
-    test_result = run_command(
-        list(task.test_command),
-        worktree,
-        artifact_dir / f"{variant}.tests.stdout.txt",
-        artifact_dir / f"{variant}.tests.stderr.txt",
-        test_timeout,
-    )
-    acceptance_result = run_command(
-        [*task.verification_prefix, "python", str(acceptance_path)],
-        worktree,
-        artifact_dir / f"{variant}.acceptance.stdout.txt",
-        artifact_dir / f"{variant}.acceptance.stderr.txt",
-        test_timeout,
-    )
-    changed_files = _status_files(worktree, base_sha)
-    diff_stats = _diff_stats(worktree, base_sha, changed_files)
-    source_text = ""
-    for name in changed_files:
-        path = worktree / name
-        if path.suffix in {".py", ".md", ".toml"} and path.is_file():
-            source_text += path.read_text(encoding="utf-8-sig", errors="replace") + "\n"
-    criteria = {
-        name: bool(re.search(pattern, source_text, re.I | re.S))
-        for name, pattern in task.required_surfaces
-    }
-    criteria.update(
-        {
-            "tests_touched": bool(diff_stats["test_files_changed"]),
-            "targeted_suite_green": test_result.get("returncode") == 0,
-            "external_acceptance_green": acceptance_result.get("returncode") == 0,
-            "codex_completed": result.get("agent_success", result.get("returncode") == 0),
-            "no_whitespace_errors": diff_stats["diff_check_passed"],
-        }
-    )
-    completion_criteria = {
-        "codex_completed": criteria["codex_completed"],
-        "tests_touched": criteria["tests_touched"],
-        "targeted_suite_green": criteria["targeted_suite_green"],
-        "external_acceptance_green": criteria["external_acceptance_green"],
-        "no_whitespace_errors": criteria["no_whitespace_errors"],
-    }
-    functional_acceptance = criteria["external_acceptance_green"]
-    completion = all(completion_criteria.values())
-    failure_reasons: list[str] = []
-    if not criteria["codex_completed"]:
-        failure_reasons.append(f"agent_{result.get('status', 'failed')}")
-    if not criteria["external_acceptance_green"]:
-        failure_reasons.append("external_acceptance_failed")
-    if not criteria["tests_touched"]:
-        failure_reasons.append("no_tests_changed")
-    if not criteria["targeted_suite_green"]:
-        failure_reasons.append("targeted_suite_failed")
-    if not criteria["no_whitespace_errors"]:
-        failure_reasons.append("diff_check_failed")
-    result.update(
-        {
-            "tests": test_result,
-            "external_acceptance": acceptance_result,
-            "diff": diff_stats,
-            "criteria": criteria,
-            "completion_criteria": completion_criteria,
-            "functional_acceptance": functional_acceptance,
-            "implementation_complete": completion,
-            "failure_reasons": failure_reasons,
-            "accepted": completion,
-            "status": "accepted" if completion else result.get("status", "failed"),
-        }
-    )
-    return result
-
-
 def _baseline_prompt(packet: dict[str, Any], task: RealTask | None = None) -> str:
     task = task or get_real_task()
     packet_json = json.dumps(packet, ensure_ascii=False, separators=(",", ":"))
@@ -1174,7 +923,12 @@ def run_benchmark(
         ),
         encoding="utf-8",
     )
-    packet = build_evidence_packet(target, artifact_dir / "evidence_packet.json", task)
+    packet = build_evidence_packet(
+        target,
+        artifact_dir / "evidence_packet.json",
+        task,
+        base_sha,
+    )
     acceptance_path = artifact_dir / "acceptance_harness.py"
     make_acceptance_harness(acceptance_path, task)
     schema_path = create_agent_report_schema(artifact_dir / "agent_output.schema.json")

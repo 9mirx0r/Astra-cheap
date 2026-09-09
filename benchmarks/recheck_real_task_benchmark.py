@@ -19,10 +19,10 @@ sys.path.insert(0, str(ROOT / "benchmarks"))
 
 from run_real_task_benchmark import (  # noqa: E402
     _log,
-    evaluate_agent,
     get_real_task,
     make_acceptance_harness,
 )
+from benchmark_evaluation import evaluate_agent  # noqa: E402
 
 
 def _pct(base: Any, treatment: Any) -> float | None:
