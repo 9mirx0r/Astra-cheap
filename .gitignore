@@ -9,3 +9,14 @@ credentials.json
 *.egg-info/
 build/
 dist/
+
+# Benchmark outputs are generated evidence, not source. Keep only the
+# canonical live run committed explicitly; intermediate runs belong in the
+# local ignored workspace or an external artifact store.
+benchmarks/dashboard_*.html
+benchmarks/results_*.json
+benchmarks/summary_*.json
+!benchmarks/dashboard_real_pytest-14635-fixture-closure-final.html
+!benchmarks/results_real_pytest-14635-fixture-closure.json
+!benchmarks/summary_real_pytest-14635-fixture-closure-final.json
+benchmarks/runs/

@@ -11,7 +11,6 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -33,6 +32,7 @@ sys.path.insert(0, str(ROOT / "benchmarks"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from benchmark_support import calculate_cost, parse_codex_telemetry  # noqa: E402
+from process_support import run_streaming_process  # noqa: E402
 from real_task_catalog import RealTask, available_tasks  # noqa: E402
 from astra_contracts import TaskSpec  # noqa: E402
 from astra_runtime import AstraRuntime  # noqa: E402
@@ -419,20 +419,6 @@ def create_agent_report_schema(path: Path) -> Path:
     return path
 
 
-def _decode(value: str | bytes | None) -> str:
-    if value is None:
-        return ""
-    return value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
-
-
-def _terminate_process_tree(proc: subprocess.Popen[bytes], cwd: Path) -> None:
-    """Stop a provider process and its descendants without leaving Codex children behind."""
-    if os.name == "nt":
-        _run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], cwd, timeout=30)
-    if proc.poll() is None:
-        proc.kill()
-
-
 def execute_agent(
     *,
     variant: str,
@@ -478,59 +464,25 @@ def execute_agent(
         f"model_reasoning_effort={effort}",
         "-",
     ]
-    started = time.perf_counter()
-    proc: subprocess.Popen[bytes] | None = None
-    timed_out = False
-    inactivity_timed_out = False
-    returncode: int | None = None
-
-    # Stream JSONL directly to disk.  The previous capture_output=True version
-    # hid progress until the process ended and made it impossible to tell a
-    # live model run from a stuck runner.
-    with prompt_path.open("rb") as prompt_file, events_path.open("wb") as events_file, stderr_path.open("wb") as stderr_file:
-        proc = subprocess.Popen(
-            cmd,
-            cwd=str(worktree),
-            stdin=prompt_file,
-            stdout=events_file,
-            stderr=stderr_file,
-            creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
-        )
-        next_heartbeat = started + 30
-        last_activity = started
-        last_size = 0
-        while proc.poll() is None:
-            now = time.perf_counter()
-            size = events_path.stat().st_size if events_path.exists() else 0
-            if size != last_size:
-                last_size = size
-                last_activity = now
-            if now >= started + timeout:
-                timed_out = True
-                _log(f"[{variant}] timeout reached; terminating Codex process tree")
-                _terminate_process_tree(proc, worktree)
-                break
-            if now - last_activity >= inactivity_timeout:
-                timed_out = True
-                inactivity_timed_out = True
-                _log(
-                    f"[{variant}] no JSONL progress for {inactivity_timeout}s; "
-                    "terminating Codex process tree"
-                )
-                _terminate_process_tree(proc, worktree)
-                break
-            if now >= next_heartbeat:
-                size_kb = events_path.stat().st_size / 1024 if events_path.exists() else 0
-                _log(f"[{variant}] still running; elapsed={now - started:.0f}s jsonl={size_kb:.0f}KiB")
-                next_heartbeat += 30
-            time.sleep(1)
-        try:
-            returncode = proc.wait(timeout=30)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            returncode = proc.wait(timeout=30)
-
-    elapsed = time.perf_counter() - started
+    # Stream JSONL directly to disk.  The shared process helper also enforces
+    # the same watchdog semantics for the other provider adapters.
+    process = run_streaming_process(
+        cmd=cmd,
+        cwd=worktree,
+        stdin_path=prompt_path,
+        stdout_path=events_path,
+        stderr_path=stderr_path,
+        activity_paths=(events_path,),
+        activity_label="JSONL",
+        heartbeat_formatter=lambda sizes: f"jsonl={sizes[0] / 1024:.0f}KiB",
+        timeout=timeout,
+        inactivity_timeout=inactivity_timeout,
+        log=lambda message: _log(f"[{variant}] {message}"),
+    )
+    elapsed = process.elapsed_seconds
+    timed_out = process.timed_out
+    inactivity_timed_out = process.inactivity_timed_out
+    returncode = process.returncode
     stdout = events_path.read_text(encoding="utf-8", errors="replace") if events_path.is_file() else ""
     usage, response_text, observed = parse_codex_telemetry(stdout)
     answer_text = answer_path.read_text(encoding="utf-8", errors="replace") if answer_path.is_file() else ""
@@ -805,62 +757,25 @@ def execute_lattice_agent(
         "--retain-worktree",
         "--no-verified-cache",
     ]
-    started = time.perf_counter()
-    proc: subprocess.Popen[bytes] | None = None
-    timed_out = False
-    inactivity_timed_out = False
-    returncode: int | None = None
-
-    with stdout_path.open("wb") as stdout_file, stderr_path.open("wb") as stderr_file:
-        proc = subprocess.Popen(
-            cmd,
-            cwd=str(LATTICE_ROOT),
-            stdout=stdout_file,
-            stderr=stderr_file,
-            creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
-        )
-        next_heartbeat = started + 30
-        last_activity = started
-        last_sizes = (0, 0)
-        while proc.poll() is None:
-            now = time.perf_counter()
-            sizes = (
-                stdout_path.stat().st_size if stdout_path.exists() else 0,
-                stderr_path.stat().st_size if stderr_path.exists() else 0,
-            )
-            if sizes != last_sizes:
-                last_sizes = sizes
-                last_activity = now
-            if now >= started + timeout:
-                timed_out = True
-                _log(f"[{variant}] timeout reached; terminating Lattice process tree")
-                _terminate_process_tree(proc, LATTICE_ROOT)
-                break
-            if now - last_activity >= inactivity_timeout:
-                timed_out = True
-                inactivity_timed_out = True
-                _log(
-                    f"[{variant}] no Lattice stdout/stderr progress for {inactivity_timeout}s; "
-                    "terminating process tree"
-                )
-                _terminate_process_tree(proc, LATTICE_ROOT)
-                break
-            if now >= next_heartbeat:
-                stdout_kb = sizes[0] / 1024
-                stderr_kb = sizes[1] / 1024
-                _log(
-                    f"[{variant}] still running; elapsed={now - started:.0f}s "
-                    f"stdout={stdout_kb:.0f}KiB stderr={stderr_kb:.0f}KiB"
-                )
-                next_heartbeat += 30
-            time.sleep(1)
-        try:
-            returncode = proc.wait(timeout=30)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            returncode = proc.wait(timeout=30)
-
-    elapsed = time.perf_counter() - started
+    process = run_streaming_process(
+        cmd=cmd,
+        cwd=LATTICE_ROOT,
+        stdin_path=None,
+        stdout_path=stdout_path,
+        stderr_path=stderr_path,
+        activity_paths=(stdout_path, stderr_path),
+        activity_label="Lattice stdout/stderr",
+        heartbeat_formatter=lambda sizes: (
+            f"stdout={sizes[0] / 1024:.0f}KiB stderr={sizes[1] / 1024:.0f}KiB"
+        ),
+        timeout=timeout,
+        inactivity_timeout=inactivity_timeout,
+        log=lambda message: _log(f"[{variant}] {message}"),
+    )
+    elapsed = process.elapsed_seconds
+    timed_out = process.timed_out
+    inactivity_timed_out = process.inactivity_timed_out
+    returncode = process.returncode
     stdout = stdout_path.read_text(encoding="utf-8", errors="replace") if stdout_path.is_file() else ""
     stderr = stderr_path.read_text(encoding="utf-8", errors="replace") if stderr_path.is_file() else ""
     lattice_result = _last_json_object(stdout)
