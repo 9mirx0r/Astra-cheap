@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "astra-ultra"
 version = "1.0.0"
-description = "Universal High-Precision Token Economizer and Reasoning Governor for OpenAI Codex"
+description = "Bounded context and verification runtime for OpenAI Codex"
 readme = "README.md"
 authors = [{ name = "Astra Ultra Team" }]
 license = { text = "MIT" }
