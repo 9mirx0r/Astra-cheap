@@ -238,6 +238,8 @@ def main() -> int:
         else:
             print(padded)
 
+    return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

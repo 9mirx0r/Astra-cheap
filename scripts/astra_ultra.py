@@ -131,7 +131,7 @@ def main() -> int:
         import json
         from astra_contracts import TaskSpec
         from astra_runtime import AstraRuntime
-        from astra_worker import CodexExecWorker, ScriptedWorker
+        from astra_worker import CodexExecWorker, ScriptedWorker, Worker
 
         def parse_argv_json(raw: str, flag: str) -> tuple[str, ...]:
             value = json.loads(raw)
@@ -164,6 +164,7 @@ def main() -> int:
             max_recoveries=parsed.max_recoveries,
             verification_timeout_seconds=parsed.verification_timeout,
         )
+        worker: Worker
         if parsed.worker == "codex":
             worker = CodexExecWorker(parsed.model, parsed.effort, parsed.worker_timeout)
         else:

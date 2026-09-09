@@ -14,7 +14,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, cast
 
 # Ensure stdout uses UTF-8 to prevent Windows charmap errors
 if hasattr(sys.stdout, "reconfigure"):
@@ -30,7 +30,7 @@ class PythonSkeletonTransformer(ast.NodeTransformer):
         super().__init__()
         self.style = style
 
-    def _create_placeholder(self) -> ast.AST:
+    def _create_placeholder(self) -> ast.stmt:
         if self.style == 'pass':
             return ast.Pass()
         return ast.Expr(value=ast.Constant(value=Ellipsis))
@@ -73,8 +73,8 @@ class PythonSkeletonTransformer(ast.NodeTransformer):
             elif isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 res = self.visit(stmt)
                 if isinstance(res, list):
-                    transformed_body.extend(res)
-                elif res:
+                    transformed_body.extend(cast(List[ast.stmt], res))
+                elif isinstance(res, ast.stmt):
                     transformed_body.append(res)
             elif isinstance(stmt, (ast.AnnAssign, ast.Assign)):
                 transformed_body.append(stmt)
