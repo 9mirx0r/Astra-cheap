@@ -1,4 +1,8 @@
-# OpenAI Codex Models, Pricing & Token Economics
+# OpenAI Codex model labels, pricing, and token economics
+
+The table below is a repository reference, not a live price sheet. Confirm
+current provider pricing before publishing a cost comparison. Benchmark reports
+should prefer the usage fields emitted by the provider.
 
 ## 1. Complete Model Pool Matrix
 
@@ -10,16 +14,17 @@
 | **`o1-mini`** | $3.00 | $1.50 (-50%) | $12.00 | $12.00 / 1M (Output rate) | 128,000 | 65,536 |
 | **`o1`** | $15.00 | $7.50 (-50%) | $60.00 | $60.00 / 1M (Output rate) | 200,000 | 100,000 |
 | **`o3`** | $2.00 | $1.00 (-50%) | $8.00 | $8.00 / 1M (Output rate) | 200,000 | 100,000 |
-| **`Luna 5.6`** | Dynamic | 50% Cached | Frontier | Dynamic CoT | 200,000 | 100,000 |
-| **`Terra`** | Dynamic | 50% Cached | Frontier | Dynamic CoT | 200,000 | 100,000 |
 
 ---
 
 ## 2. The Reasoning Token Asymmetry
 
-In reasoning models (`o1`, `o3-mini`, `o3`, `Luna 5.6`, `Terra`):
-- Internal chain-of-thought (CoT) tokens are **billed at the output token rate**.
-- When running in **High, Max, or Extreme effort**, a single turn can generate 20,000 to 50,000+ reasoning tokens.
-- Reasoning tokens are **ephemeral**: they are never returned to the caller and cannot be cached across conversational turns.
-- In multi-turn agent loops, the model **re-reasons from scratch on every turn**.
-- **Defense Strategy**: Keep prompts concise and focused on exact error lines. Never inject 15,000 lines of passing test logs or 3,000-line files.
+In reasoning models such as `o1`, `o3-mini`, and `o3`:
+- Provider accounting may include reasoning output in the output-token total.
+- Higher effort can increase output and latency. Record the provider usage event
+  instead of assuming a fixed reasoning-token count.
+- Cached input accounting depends on the provider and the host client.
+- In multi-turn agent loops, repeated context can increase both input volume and
+  latency.
+- Keep prompts focused on exact error lines. Do not inject large passing logs or
+  whole files when a bounded view is sufficient.

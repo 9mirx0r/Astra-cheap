@@ -52,8 +52,6 @@ jobs:
           benchmarks/real_task_catalog.py
           benchmarks/real_task_evidence.py
           benchmarks/run_real_task_benchmark.py
-          --select E4,E7,E9,F
-          --ignore E402
 
       - name: Type-check scripts
         run: >-

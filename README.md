@@ -1,265 +1,167 @@
-<div align="center">
-
-<img src="assets/astra-ultra.png" alt="Astra Ultra Mascot Banner" width="480" />
-
 # Astra-Ultra
 
-**Bounded context and verification runtime for OpenAI Codex.**
-Reduce repeated repository context while keeping correctness checks outside the
-agent and making the trade-offs visible.
+Bounded context and verification runtime for OpenAI Codex.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square)](https://www.python.org/)
-[![Tests: 119/119 Passing](https://img.shields.io/badge/Tests-119%2F119%20Passing-emerald.svg?style=flat-square)](#tests)
-[![agentskills.io](https://img.shields.io/badge/Skill-agentskills.io%20Validated-blue.svg?style=flat-square)](#skill-standard)
-[![OpenAI Cache Aligned](https://img.shields.io/badge/OpenAI%20Cache-Aligned%20128--tok-purple.svg?style=flat-square)](#1-prefix-lock--128-token-cache-quantization)
-[![Models](https://img.shields.io/badge/Models-Luna%205.6%20%7C%20Terra%20%7C%20o1%20%7C%20o3--mini-orange.svg?style=flat-square)](#universal-model-support)
+[![CI](https://github.com/9mirx0r/Astra-cheap/actions/workflows/ci.yml/badge.svg)](https://github.com/9mirx0r/Astra-cheap/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![agentskills.io](https://img.shields.io/badge/skill-agentskills.io-purple.svg)](https://agentskills.io)
 
-</div>
+Astra-Ultra keeps repository context small and puts correctness checks outside
+the model. It is a set of deterministic CLI tools plus a bounded runtime for
+Codex workers. The runtime records enough telemetry to inspect token use,
+latency, verification, and recovery instead of collapsing them into one score.
 
----
+## What it does
 
-## Why Astra-Ultra?
+Coding agents commonly spend context on raw test logs, whole files, repeated
+directory searches, and failed patch attempts. Astra-Ultra addresses those
+costs with explicit limits:
 
-When running autonomous coding agents on OpenAI Codex, subscription quotas and API tokens often evaporate because of three issues:
+- a repository map that fits a configurable token budget;
+- AST skeletons that retain signatures, types, and docstrings without bodies;
+- bounded source windows and terminal output masking;
+- prompt-cache padding at 128-token boundaries;
+- transactional patch application followed by host-side verification.
 
-1. **Terminal dumps:** Running test suites (`pytest`, `cargo test`) dumps thousands of lines of noisy logs into context.
-2. **Whole-file dumping:** Inspecting a 1,500-line file just to check a method signature or interface.
-3. **Reasoning amnesia & repetitive loops:** High-effort reasoning models (like **Luna 5.6 High** or **o1/o3**) consume thousands of internal chain-of-thought tokens per turn just navigating folders and reading raw logs.
+The runtime is provider-agnostic. The public examples use standard OpenAI
+model identifiers such as `o3-mini`, `o1`, and `gpt-4o`; the benchmark harness
+also accepts provider-specific identifiers when a host exposes them.
 
-**Astra-Ultra is a context hygiene and reasoning governance toolkit.** It
-provides bounded source views, separates provider execution from host-side
-verification, and records enough telemetry to inspect the cost/latency trade-off
-instead of hiding it behind a single score.
+## Measured benchmark
 
----
+The repository includes a controlled three-arm run on pytest issue #14635. The
+baseline, Astra-Ultra, and Lattice arms used isolated worktrees, the same base
+commit, a focused test command, an independent acceptance oracle, and a
+one-hour wall-clock limit. All three arms were accepted on that task.
 
-## Calibrated Workload Profiles
-
-Reference telemetry measured on complex distributed systems fixtures (Raft 35,000-line cluster trace and concurrent MVCC rollback race condition):
-
-| Workload | Model & Effort | Baseline Tokens | Astra-Ultra Tokens | Savings | Speedup | Result |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Raft Consensus Split-Brain** (35k-line trace) | **Luna 5.6 (High)** | 142,800 | 28,600 | **-80.0%** | **3.4x** | PASS |
-| **MVCC / ARIES Rollback Race Condition** | **Terra (Medium)** | 116,198 | 22,450 | **-80.7%** | **3.3x** | PASS |
-| **Vector Index Rebalance** | **o3-mini (High)** | 98,400 | 21,300 | **-78.4%** | **2.9x** | PASS |
-
-> **Note on Benchmarks:** Figures above reflect calibrated reference profiles on synthetic fixtures. Actual live token consumption depends on host rendering, tool schemas, and session depth. For live CLI benchmarking with host credentials, run with `ASTRA_BENCHMARK_LIVE=1`. See [`benchmarks/COMPLEX_BENCHMARKS.md`](benchmarks/COMPLEX_BENCHMARKS.md).
-
----
-
-## Verifiable Live Benchmark: Baseline vs. Astra-Ultra vs. Lattice
-
-The latest controlled run used the same `pytest` base commit, the same
-`gpt-5.6-luna` model, `max` reasoning effort, detached worktrees, a one-hour
-wall-clock limit, a focused test suite, and an independent acceptance oracle.
-All three arms were functionally accepted.
-
-| Arm | Total tokens* | Cost | Time | Result |
+| Arm | Total tokens | Cost | Wall time | Result |
 | :--- | ---: | ---: | ---: | :--- |
 | Baseline | 4,144,093 | US$0.27426 | 807.94 s | PASS |
 | **Astra-Ultra** | **251,274** | **US$0.12367** | 1,446.05 s | **PASS** |
 | **Lattice** | 2,270,213 | US$0.17742 | **437.50 s** | **PASS** |
 
-\*Total tokens means provider-reported input plus output. Reasoning tokens are
-included in output and are not added a second time.
+In this run, Astra-Ultra used the fewest tokens and had the lowest measured
+cost. Lattice had the lowest wall-clock time. That is evidence from one task,
+not a general leaderboard. The historical report keeps the exact provider
+identifier and raw artifacts required to reproduce the trial.
 
-On this task, Astra-Ultra had the lowest measured token and monetary cost while
-preserving the same acceptance result. Lattice had the lower latency. This is a
-task-level result, not a general leaderboard.
+See the complete methodology and limitations in
+[`docs/REAL_BENCHMARK_2026-09-08.md`](docs/REAL_BENCHMARK_2026-09-08.md). The
+machine-readable result and dashboard remain in `benchmarks/`.
 
-- Astra-Ultra used **95.79% less input** and cost **54.91% less than Baseline**.
-- Astra-Ultra also used **88.93% fewer total tokens** and cost **30.29% less
-  than Lattice**, while both passed acceptance.
-- Lattice was **3.30× faster than Astra-Ultra**, so it is the latency reference,
-  not the efficiency winner.
-- Quality was tied for this task: **3/3 accepted**. One task is evidence for
-  engineering direction, not a general leaderboard.
+## How it works
 
-The complete methodology, raw usage summary, limitations, and architectural
-comparison are in [`docs/REAL_BENCHMARK_2026-09-08.md`](docs/REAL_BENCHMARK_2026-09-08.md).
-The generated artifacts are [`the dashboard`](benchmarks/dashboard_real_pytest-14635-fixture-closure-final.html)
-and [`the machine-readable summary`](benchmarks/summary_real_pytest-14635-fixture-closure-final.json).
-
-## What Changed Since the Previous Benchmark
-
-The earlier attempts were not suitable for comparison: at least one arm timed
-out before producing reviewable work, some provider responses did not conform
-to the patch protocol, and the runs did not share a complete correctness gate.
-Those numbers are not used as proof of performance.
-
-This version adds a verifiable execution boundary:
-
-1. **One immutable base commit per arm.** Baseline, Astra-Ultra, and Lattice
-   work in isolated detached worktrees, so one agent cannot affect another.
-2. **Two correctness gates.** The focused test command and an independent
-   black-box acceptance oracle are recorded separately; a passing model
-   response alone is never counted as success.
-3. **Transactional patching.** Paths are constrained, fingerprints are checked,
-   invalid patches are rejected, and failed verification rolls the worktree
-   back before recovery.
-4. **Bounded execution.** Turns, context page faults, recoveries, inactivity,
-   verification, and total wall-clock time have explicit limits.
-5. **Truthful telemetry.** JSONL provider events preserve input, cached input,
-   output, reasoning, turns, tool calls, per-stage latency, and missing values
-   as `null` instead of inventing zeros.
-6. **Reproducible reporting.** Raw result JSON produces the comparison table,
-   charts, dashboard, and the audit report without manually transcribing
-   numbers.
-
-The current Astra runtime is therefore measurable and safe to optimize. The
-next runtime improvement is persistent provider sessions plus structured edit
-handles: Lattice won latency by retaining its session and front-loading more
-context, while Astra won token and cost efficiency by keeping the context
-small.
-
-## How Astra-Ultra Compares to Other Approaches
-
-The live run supports a narrower conclusion: **Astra-Ultra had the best measured
-efficiency profile in this trial**. It used fewer tokens and cost less than the
-unoptimized baseline and Lattice, while the current worker was slower than
-Lattice. Lattice is not a cheaper alternative in this run: Astra-Ultra cost
-US$0.12367 versus Lattice's US$0.17742.
-
-The practical ranking from this trial is:
-
-1. **Astra-Ultra:** best measured efficiency profile and lowest cost, with
-   correctness preserved.
-2. **Lattice:** best raw latency, but with substantially higher input volume
-   and cost than Astra-Ultra.
-3. **Baseline:** useful reference arm, but worst on tokens and cost.
-
-This ranking is provisional until the same protocol is repeated across several
-real tasks and randomized arm orders.
-
-The repositories in the ecosystem comparison solve different layers of the
-problem, so they cannot be ranked honestly from this single coding task:
-
-| Approach | Primary strength | Relationship to Astra-Ultra |
-| :--- | :--- | :--- |
-| Vanilla Codex / Baseline | Zero setup and unrestricted exploration | Reference arm; fastest development surface is not token-efficient |
-| **Lattice** | Persistent worker session, bounded context grants, structured patch transaction | Current latency reference; its session model is the main feature Astra should adopt |
-| Aider | Tree-sitter and PageRank repository map | Useful saliency technique; not a complete transactional runtime |
-| RTK | Very fast terminal-output filtering | Complements Astra's sanitizer; does not understand code dependencies |
-| Repomix | Static whole-repository packaging and AST compression | Useful packaging layer; not an iterative worker or verifier |
-| `codex-usage-audit` / `prompt-pack` | Rollout accounting, hooks, and progressive-disclosure discipline | Valuable telemetry and policy ideas; not a replacement for Astra's patch boundary |
-
-The detailed feature matrix and clone audit are in
-[`docs/COMPARISON_AND_COMPETITIVE_ANALYSIS.md`](docs/COMPARISON_AND_COMPETITIVE_ANALYSIS.md)
-and [`benchmarks/ECOSYSTEM_COMPARISON.md`](benchmarks/ECOSYSTEM_COMPARISON.md).
-
----
-
-## How It Works: The 5 Pillars
+The five main mechanisms are deliberately plain:
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│  1. PREFIX LOCK & 128-TOKEN QUANTIZATION (>=1024 tok, cache alignment) │
-│     Locks static headers at byte 0; pads to 128-token block multiples. │
-├────────────────────────────────────────────────────────────────────────┤
-│  2. REPOMAP GRAPH (<=1024 tokens)                                      │
-│     AST PageRank for Python; regex heuristics for polyglot files.      │
-├────────────────────────────────────────────────────────────────────────┤
-│  3. AST SKELETONS & SURGICAL WINDOWS                                   │
-│     Elides function bodies with '...' (<50 tok/file); max 50-line view.│
-├────────────────────────────────────────────────────────────────────────┤
-│  4. NOISE SANITIZER & OBSERVATION MASKING                              │
-│     Caps test output to 25 failure lines; hashes historic tool output. │
-├────────────────────────────────────────────────────────────────────────┤
-│  5. BOUNDED ASYMMETRIC SYNTHESIS (Luna 5.6 High Pareto)               │
-│     Deterministic context first; recovery turns remain bounded.         │
-└────────────────────────────────────────────────────────────────────────┘
+1. Prompt-cache quantization
+   Pad static prompt text to 128-token boundaries after the cache threshold.
+
+2. PageRank repository map
+   Rank files and symbols so the model receives topology before implementation.
+
+3. AST skeletons and bounded windows
+   Replace function bodies with `...` and inspect only the relevant lines.
+
+4. Log suppression and observation masking
+   Keep full logs on disk while showing a bounded failure summary to the model.
+
+5. Two-phase execution
+   Deterministic reconnaissance isolates the change; bounded patch generation
+   produces the edit. The host applies and verifies it transactionally.
 ```
 
-### 1. Prefix Lock & 128-Token Cache Quantization
-OpenAI caches prompt prefixes starting at 1,024 tokens in 128-token increments ($1024 + 128 \times k$), offering 50% to 90% discounts on cached inputs depending on the model. Astra-Ultra hashes static workspace invariants with SHA-256 Merkle trees and pads prefixes with neutral comment lines (`# --- astra-ultra:cache-align ---`) to reduce cache boundary straddling. Token counts use a standard `(len + 3) // 4` approximation; live cache hit rates depend on host client rendering.
+### Prompt-cache quantization
 
-### 2. RepoMap Graph ($\le 1,024$ tokens)
-Packs the project topology into **under 1,024 tokens** using Personalized PageRank. Python modules use AST-based structural symbol extraction (classes, functions, type hints, docstrings, and identifier frequency); polyglot languages (TS/JS, Go, Rust) use regex identifier heuristics—an intentional zero-dependency design choice for instant startup rather than heavy semantic compiler passes.
+`astra_prefix_lock.py` canonicalizes static text, records a SHA-256 Merkle
+manifest, and can pad a prefix to a 128-token boundary. Token counts are a
+standard `(len(text) + 3) // 4` estimate. Actual cache behavior depends on the
+host client and provider telemetry.
 
-### 3. AST Skeletons (`...`)
-Need to inspect a module structure? `astra-ast` strips implementation bodies and replaces them with `...`, preserving class hierarchies, type hints, and docstrings for **under 50 tokens per file**.
+### PageRank repository map
 
-### 4. Noise Sanitization & Observation Masking
-- Blocks accidental `cat` or `type` dumps on files over 40 lines.
-- Intercepts `pytest`, `cargo`, and `npm test` runs, logging full traces to `.local/logs/` while displaying only the failure summary and last 25 lines.
-- Hashes historical command output once a patch is verified to prevent models from re-reasoning over stale text.
+`astra_repomap.py` builds a structural map within a requested budget. Python
+files use AST symbols and identifier frequency. TypeScript, JavaScript, Go,
+and Rust use lightweight identifier heuristics to keep startup dependency-free.
 
-### 5. Bounded Asymmetric Synthesis for Luna 5.6 High
-Frontier reasoning models consume 20,000–50,000+ internal tokens per turn. Astra-Ultra decouples discovery from synthesis while keeping recovery bounded:
-- **Phase 1 (Recon):** Low-cost deterministic tools isolate the causal issue to $\le 50$ lines of code.
-- **Phase 2 (Synthesis):** Luna 5.6 High receives bounded source pages and emits a canonical patch diff.
-- **Phase 3 (Verification):** The host applies the patch transactionally, runs focused tests, and then runs an independent acceptance oracle.
-- **Phase 4 (Recovery):** A failed patch or gate is rolled back and returned as bounded evidence for a limited number of correction turns.
+### AST skeletons and bounded windows
 
----
+`astra_ast.py` preserves classes, signatures, annotations, and docstrings while
+eliding function bodies. The runtime then requests bounded pages instead of
+dumping whole files into the worker context.
 
-## Security & Confinement
+### Log suppression and observation masking
 
-Astra-Ultra's FastMCP server (`astra_mcp_server.py`) enforces immutable **workspace path confinement**. The server workspace boundary is fixed at launch (via `--root`, `--workspace-root`, `ASTRA_WORKSPACE_ROOT`, or working directory) and cannot be overridden by tool call arguments. Any attempt by an MCP client to read or navigate outside the workspace boundary (e.g. `../../` path traversal or root spoofing) is rejected with an access denial error.
+`astra_sanitizer.py` keeps complete command output in `.local/logs/` and shows
+only a bounded summary plus the last 25 failure lines. Historical observations
+can be masked after verification so the worker does not repeatedly analyze old
+output.
 
----
+### Two-phase execution and verification
+
+The runtime separates deterministic reconnaissance from patch generation. It
+constrains changed paths, snapshots the allowed files, applies patches through
+Git, runs the declared test command, and rolls back failed verification before
+starting a bounded recovery.
+
+## Security and confinement
+
+The FastMCP server fixes its workspace boundary at launch through `--root`,
+`--workspace-root`, `ASTRA_WORKSPACE_ROOT`, or the current working directory.
+Tool calls cannot replace that boundary. Path traversal and root spoofing are
+rejected.
 
 ## Quickstart
 
-### 1. Installation
 ```bash
 git clone https://github.com/9mirx0r/Astra-cheap.git
 cd Astra-cheap
-pip install -e .
+python -m pip install -e .
 ```
 
-### 2. Using with Codex
-Astra-Ultra is an [`agentskills.io`](https://agentskills.io) compatible skill. Copy or link this folder into your skills directory:
+Astra-Ultra is compatible with the agentskills.io skill layout. Use it in
+Codex with:
 
 ```text
 Use $astra-ultra for this task.
 ```
 
-### 3. CLI Utilities
-You can also run any Astra-Ultra engine directly from your terminal:
+The public CLI exposes the individual mechanisms:
 
 ```bash
-# Generate budget-fitted RepoMap (<= 1024 tokens)
+# Generate a budget-fitted repository map
 astra-ultra map --root . --budget 1024
 
-# Extract AST skeleton of any Python / TS file
+# Extract a Python, TypeScript, or JavaScript skeleton
 astra-ultra skeleton --source src/engine.py
 
-# Quantize and align system prompt to 128-token cache boundaries
+# Align a prompt to 128-token cache boundaries
 astra-ultra lock quantize --input system_prompt.txt --boundary 128
 
-# Display Luna 5.6 High Asymmetric Reasoning Protocol
-astra-ultra govern --asymmetric
+# Print bounded reasoning-effort guidance
+astra-ultra govern --model o3-mini --effort high
 
-# Start FastMCP stdio symbol server
+# Run the FastMCP self-test
 astra-ultra mcp --test
 ```
 
-For the verifiable host runtime, see [`docs/ASTRA_RUNTIME.md`](docs/ASTRA_RUNTIME.md). It separates the focused test command from an independent acceptance oracle and records raw provider artifacts when available.
+For the host runtime, see [`docs/ASTRA_RUNTIME.md`](docs/ASTRA_RUNTIME.md).
+For the benchmark harness, see [`benchmarks/README.md`](benchmarks/README.md).
 
----
+## Verification
 
-## Verification & Tests
-
-Astra-Ultra includes a deterministic test suite with **119 unit tests** and strict skill validation:
+The repository has 119 deterministic unit tests, skill validation, Ruff, and
+mypy gates. Run the local checks with:
 
 ```bash
-# Run unit tests
-python -m unittest discover -s tests
-# Ran 119 tests - OK
-
-# Validate agentskills.io compliance
+python -m unittest discover -s tests -p 'test_*.py'
 python quick_validate.py --skill .
-# Summary: 1 evaluated | 1 passed | 0 failed | 0 warning(s)
+ruff check scripts
+mypy --follow-imports=normal --ignore-missing-imports scripts
 ```
 
-CI runs Ruff and mypy across all `scripts/`, including the compatibility
-utilities, plus Ruff on the active benchmark harness. This keeps the public
-and legacy entry points visible to the same syntax, lint, and type gates while
-leaving deeper behavioral migration work explicit in the test suite.
-
----
+CI runs the same checks on Python 3.10, 3.12, and 3.13.
 
 ## License
 

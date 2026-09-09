@@ -7,10 +7,28 @@ name = "astra-ultra"
 version = "1.0.0"
 description = "Bounded context and verification runtime for OpenAI Codex"
 readme = "README.md"
-authors = [{ name = "Astra Ultra Team" }]
+authors = [{ name = "9mirx0r" }]
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = []
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/9mirx0r/Astra-cheap"
+Repository = "https://github.com/9mirx0r/Astra-cheap"
+Issues = "https://github.com/9mirx0r/Astra-cheap/issues"
 
 [project.optional-dependencies]
 dev = ["mypy>=2.3,<2.4", "ruff>=0.16,<0.17"]
@@ -46,3 +64,10 @@ py-modules = [
     "usage_ledger",
     "evidence_receipts"
 ]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E402"]

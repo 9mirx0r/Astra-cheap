@@ -1,4 +1,4 @@
-# OpenAI Hardware-Invariant Prefix Locking Guide
+# OpenAI prompt-cache quantization guide
 
 ## 1. OpenAI Prompt Caching Mechanics
 

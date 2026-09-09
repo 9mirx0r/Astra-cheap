@@ -64,9 +64,9 @@ efficiency behavior, never host safety or project requirements. Do not downgrade
 an implicit fix for poor measurements.
 
 Design references (not runtime dependencies or guaranteed savings):
-- https://github.com/JuliusBrussee/caveman — concise output and recoverable input views.
-- https://github.com/DietrichGebert/ponytail — avoiding unnecessary implementation.
-- https://learn.chatgpt.com/docs/pricing — official usage factors and current rates.
+- https://github.com/JuliusBrussee/caveman: concise output and recoverable input views.
+- https://github.com/DietrichGebert/ponytail: avoiding unnecessary implementation.
+- https://learn.chatgpt.com/docs/pricing: official usage factors and current rates.
 
 This package's dependency capsules and decision-driven workflow are a local design, not a claim
 of research novelty or a replacement for a model benchmark.

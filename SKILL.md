@@ -1,101 +1,123 @@
 ---
 name: astra-ultra
 description: >-
-  Universal token economization, cognitive reasoning governance, and context scaffolding engine for OpenAI Codex.
-  Operates across ALL models (Luna 5.6, Terra, o1, o3-mini, o3, GPT-4o) and ALL reasoning effort levels (low, medium, high, max).
-  Enforces OpenAI prompt caching preservation (<=1024-token RepoMap), AST skeletonization, bounded window inspection,
-  terminal noise suppression, and circuit-breaker protection against token exhaustion loops.
+  Bounded context and verification tools for OpenAI Codex.
+  Supports public reasoning models such as o1, o3, o3-mini, and GPT-4o,
+  with explicit limits for context, recovery, terminal output, and verification.
 metadata:
-  short-description: Universal Codex token economizer & reasoning governor
+  short-description: Bounded context and verification tools for Codex
 ---
 
-# Astra-Ultra: Quota Optimization & Reasoning Governance for Codex
+# Astra-Ultra
 
-Astra-Ultra is an engineering toolkit for OpenAI Codex designed to reduce context bloat, improve reasoning focus, and optimize OpenAI Prompt Caching hit rates across reasoning models (Luna 5.6, Terra, o1, o3-mini, o3, and GPT-4o).
+Astra-Ultra is a small engineering toolkit for OpenAI Codex. It reduces
+context bloat, keeps repository inspection bounded, and moves correctness
+checks into deterministic host-side code.
 
-Operational Scope: **Compatible with any model in Codex (including Luna 5.6, Terra, o1, o3-mini) across reasoning effort tiers (from low to high/max/extreme).**
+The tools are model-agnostic. Examples use `o1`, `o3`, `o3-mini`, and `gpt-4o`,
+but the runtime accepts any provider identifier supported by the host.
 
----
+## 1. Before editing
 
-## 1. The Ladder of Laziness (YAGNI Hierarchy)
+Before writing a patch:
 
-Before authoring code or proposing diffs, verify:
-1. **Does this need to exist? (YAGNI):** Eliminate speculative features, unrequested helpers, or decorative refactors.
-2. **Already in this codebase?:** Search definitions via `grep_search` or `astra_repomap.py subgraph` before writing.
-3. **Does standard library do it?:** Prioritize built-in modules over third-party dependencies.
-4. **Native platform feature?:** Utilize native OS/shell primitives before adding custom scripts.
-5. **Smallest working patch:** Deliver the minimal valid unified diff that satisfies acceptance criteria.
+1. Search for an existing implementation or contract.
+2. Prefer the standard library and existing repository tools.
+3. Read the smallest source window that can establish the invariant.
+4. Make the smallest patch that satisfies the acceptance criteria.
+5. Run the declared tests and the independent acceptance check when available.
 
----
+Do not add speculative helpers, decorative refactors, or a new dependency for a
+problem already solved by the repository.
 
-## 2. Universal Reasoning Model Governance (Luna 5.6 High, o1, o3-mini)
+## 2. Reasoning effort controls
 
-When reasoning models operate at **High, Max, or Extreme effort**:
-* **The Reasoning Token Asymmetry**: Internal chain-of-thought generates 15,000–50,000+ tokens billed at full **output token rates**.
-* **Zero Conversational Filler**: Never narrate tool intent before execution. Provide patch hunks first, followed by at most 2 lines: what changed and how to verify.
-* **Observation Masking**: Historical tool outputs (verbose bash runs, passing test logs) must be masked once their diff is verified to prevent models from re-reasoning over stale text.
-* **Deterministic 2-Recovery Circuit Breaker**: If 2 recovery attempts fail on the same source hash, **halt packing immediately**. Switch directly to bounded `view_file` on exact line numbers.
+The runtime accepts `none`, `low`, `medium`, `high`, `max`, and `xhigh` effort
+labels. Choose the lowest level that can solve the task. Use higher effort for
+concurrency, distributed state, or cross-module invariants, and keep the input
+focused on the relevant evidence.
 
-### 2.1 Asymmetric 1-Turn Protocol (Luna 5.6 High / o1 / o3)
-To eliminate runaway reasoning token loops on difficult tasks while preserving strict code correctness:
-1. **Phase 1: Deterministic Reconnaissance (Tier-0/1)**:
-   - Run AST skeletons (`astra_ast.py`), RepoMap lookups, and bounded inspection ($\le 50$ lines).
-   - **Strictly Prohibited on Luna 5.6 High**: Never invoke high-effort reasoning to browse folders, grep text, or read 100+ line logs.
-2. **Phase 2: Asymmetric 1-Turn Cognitive Engine (Luna 5.6 High / o1 / o3)**:
-   - Provide only the isolated 50-line window + AST topology + the specific invariant/race condition to prove.
-   - Luna 5.6 is prompted to synthesize the fix in a single focused turn.
-3. **Phase 3: Deterministic Test Interceptor**:
-   - Run the test suite wrapped by `astra_sanitizer.py`. Verify patch with zero token noise.
+For every effort level:
 
----
+- do not feed unfiltered passing logs or whole files into the model;
+- mask old observations after a patch has been verified;
+- stop recovery after the configured limit for the same source state;
+- record provider usage instead of estimating success from prompt length.
 
-## 3. Progressive Disclosure Architecture
+### 2.1 Two-phase execution
 
-Never dump entire files into context. Acquire codebase intelligence through surgical layers:
+The recommended execution path separates mechanical discovery from patch
+generation:
+
+1. Deterministic reconnaissance uses the repository map, AST skeletons, search,
+   and bounded source windows to isolate the causal code.
+2. Bounded patch generation receives only the relevant pages and the acceptance
+   contract, then returns a canonical patch.
+
+The host applies the patch transactionally, runs the focused tests, and sends a
+bounded failure back for recovery when the contract allows another attempt.
+
+## 3. Progressive disclosure
+
+Inspect the repository through progressively more detailed views:
 
 ```
-[Level 0: RepoMap <=1024 tok] -> [Level 1: AST Skeletons] -> [Level 2: Bounded Slices] -> [Level 3: Atomic Patch]
+[RepoMap] -> [AST skeleton] -> [bounded source page] -> [atomic patch]
 ```
 
-### 3.1 Personalized PageRank RepoMap (`scripts/astra_repomap.py`)
-- **When**: Session initialization or investigating cross-module dependencies.
-- **Contract**: Generates an AST symbol reference tree in **$\le 1,024$ tokens**, aligning with OpenAI's prompt cache threshold:
-  ```bash
-  python scripts/astra_repomap.py map --root . --budget 1024
-  ```
+### 3.1 PageRank repository map
 
-### 3.2 AST Structural Inspection (`scripts/astra_ast.py`)
-- **When**: Exploring classes, interfaces, function signatures, types, and docstrings.
-- **Contract**: Elides implementation bodies with `...` (<50 tokens per file):
-  ```bash
-  python scripts/astra_ast.py skeleton --source src/module.py
-  ```
+Use `scripts/astra_repomap.py` to rank files and symbols within a token budget:
 
-### 3.3 Bounded Windowed Inspection (ACI Protocol)
-- **When**: Inspecting code around an edit site.
-- **Contract**: Inspect windows of **50 to 100 lines max** with a 2-line overlap. Unbounded `cat`, `type`, or whole-file viewing on files >40 lines is prohibited.
+```bash
+python scripts/astra_repomap.py map --root . --budget 1024
+```
 
-### 3.4 Hardware-Invariant Prefix Locking & 128-Token Cache Quantization (`scripts/astra_prefix_lock.py`)
-- **When**: Preserving static instructions to maximize prompt cache hits across multi-turn sessions:
-  ```bash
-  python scripts/astra_prefix_lock.py build --root . --out prefix_lock.json
-  python scripts/astra_prefix_lock.py verify --root . --manifest prefix_lock.json
-  ```
-- **128-Token Cache Quantization**: Quantizes and pads static prompt prefixes to exact 128-token boundary multiples ($\ge 1024$ tokens) using neutral comment blocks. Ensures dynamic message insertions never cause cache-boundary straddling or cache churn:
-  ```bash
-  python scripts/astra_prefix_lock.py quantize --input system_prompt.txt --out aligned_prompt.txt --boundary 128
-  ```
+Python files use AST symbols and identifier frequency. Other supported source
+files use lightweight identifier heuristics so the command has no runtime
+dependency on a compiler or third-party parser.
 
-### 3.5 Terminal Noise Sanitization (`scripts/astra_sanitizer.py`)
-- **When**: Running tests (`pytest`, `npm test`, `cargo test`, `go test`).
-- **Contract**: Diverts full logs to `.local/logs/test_output.log` and surfaces only the failure summary and last 25 lines with a recovery hint.
+### 3.2 AST structural inspection
 
----
+Use `scripts/astra_ast.py` when signatures, classes, annotations, or docstrings
+matter more than implementation bodies:
 
-## 4. Technical References
+```bash
+python scripts/astra_ast.py skeleton --source src/module.py
+```
 
-- **[Model Pool & Pricing Matrix](references/codex_models_and_economics.md)**: Pricing, context limits, and reasoning token scaling.
-- **[Reasoning Effort Governance](references/reasoning_governance.md)**: Strategies for Luna 5.6 High, Terra, o1, and o3-mini.
-- **[Observation Masking Protocol](references/observation_masking.md)**: JetBrains-style state preservation without lossy summarization.
-- **[OpenAI Prefix Locking Guide](references/prefix_locking.md)**: Invariance rules for the 1,024-token cache threshold.
-- **[Spanish Quickstart Guide](references/usage-es.md)**: Guía práctica de uso diario para Astra-Ultra.
+Function bodies are replaced with `...` or `pass` while the surrounding
+structure remains visible.
+
+### 3.3 Bounded source windows
+
+Inspect roughly 50 to 100 lines around an edit site, with a small overlap when
+the boundary matters. Do not dump a large file or a complete passing test log
+when a focused failure summary is enough.
+
+### 3.4 Prompt-cache quantization
+
+Use `scripts/astra_prefix_lock.py` to build a deterministic prefix manifest or
+pad static text to a 128-token boundary:
+
+```bash
+python scripts/astra_prefix_lock.py build --root . --out prefix_lock.json
+python scripts/astra_prefix_lock.py verify --root . --manifest prefix_lock.json
+python scripts/astra_prefix_lock.py quantize --input prompt.txt --out aligned.txt --boundary 128
+```
+
+The command uses a character-based token estimate and neutral comment padding.
+Actual cache hits depend on the host client and provider behavior.
+
+### 3.5 Terminal output masking
+
+Use `scripts/astra_sanitizer.py` for test commands. It keeps full output on
+disk and presents a bounded summary plus the final failure lines to the model.
+
+## 4. References
+
+- [Model labels and economics](references/codex_models_and_economics.md)
+- [Reasoning effort controls](references/reasoning_governance.md)
+- [Observation masking](references/observation_masking.md)
+- [Prompt-cache quantization](references/prefix_locking.md)
+- [Spanish quickstart](references/usage-es.md)

@@ -1,48 +1,57 @@
-# Reasoning Effort Governance Protocol
+# Reasoning effort controls
 
-## 1. Universal Effort Tiers: none, low, medium, high, max, xhigh
+## 1. Effort labels
 
-Astra-Ultra operates across **any model** and **any effort level**:
-- **`low`**: Use for trivial linting, syntax fixes, typo remediation, and single-file boilerplate.
-- **`medium`**: Recommended default for general multi-file refactoring, API integrations, and bug diagnosis.
-- **`high` / `max` / `xhigh`**: Deployed when running frontier models like **`Luna 5.6`** on intricate concurrency, distributed consensus, or complex architectural synthesis.
+Astra-Ultra supports the labels `none`, `low`, `medium`, `high`, `max`, and
+`xhigh`. The model provider decides which labels are available for a given
+model. Examples in this repository use `o1`, `o3`, and `o3-mini`.
 
----
+- `low`: linting, syntax fixes, and small single-file edits.
+- `medium`: ordinary multi-file changes, integrations, and bug diagnosis.
+- `high`, `max`, and `xhigh`: concurrency, distributed state, and changes that
+  require reasoning across several invariants.
 
-## 2. High-Effort Safeguards for Luna 5.6 and Frontier Reasoning
+Choose the lowest level that can satisfy the acceptance contract. The correct
+level depends on the task, not on the product name.
 
-When high effort is engaged:
-1. **Never Feed Unfiltered Logs**: A 15,000-line test log forces high-effort reasoning to inspect irrelevant passing tests, burning up to 35,000 CoT tokens needlessly.
-2. **Code-First Response**: Emit `apply_patch` diffs first. Follow with at most 2 concise lines of explanation.
-3. **Observation Masking**: Immediately mask older tool outputs once a patch is verified to stop the model from re-reasoning over historical execution steps.
-4. **2-Recovery Limit**: If 2 recovery attempts fail on the same source hash, trip the circuit breaker and read exact line numbers directly.
+## 2. Input discipline
 
----
+Higher effort does not make irrelevant input useful. Before calling the model:
 
-## 3. Asymmetric 1-Turn Pipeline (Pareto Cognitivo)
+1. Remove passing logs that do not constrain the change.
+2. Use the repository map and AST skeleton before opening implementation bodies.
+3. Keep source windows near the failure or requested edit.
+4. Preserve the exact acceptance contract and relevant error output.
+5. Record provider telemetry so token and latency claims are measured.
 
-High-effort reasoning in frontier models (Luna 5.6 High, o1, o3-mini) is extremely potent on complex logic, but consumes 20,000–50,000+ internal tokens per turn. Running Luna 5.6 High across a 10-turn multi-file search rapidly depletes 5-hour rolling quotas.
+After a patch is verified, mask stale observations. If recovery fails for the
+configured number of attempts on the same source state, stop rather than
+repacking the same evidence indefinitely.
 
-The **Asymmetric 1-Turn Pipeline** decouples mechanical discovery from causal synthesis:
+## 3. Two-phase execution
+
+The runtime separates deterministic reconnaissance from bounded patch
+generation:
 
 ```
-[Phase 1: Deterministic Recon]
-   ├── Tier-0/1 Tools (astra_ast, astra_repomap, grep_search, bounded view_file)
-   └── Isolates problem strictly to <= 50 lines of code + error traceback
-         │
-         ▼
-[Phase 2: Asymmetric 1-Turn Synthesis]
-   ├── Model: Luna 5.6 (High / Max Effort)
-   ├── Turn Budget: EXACTLY 1 TURN
-   ├── Payload: Isolated 50-line window + AST topology + exact invariant
-   └── Output: Pure mathematical/logical solution & unified patch diff
-         │
-         ▼
-[Phase 3: Deterministic Test Interceptor]
-   └── Runs astra_sanitizer test wrapper (zero token noise)
+[Recon]
+  astra_ast, astra_repomap, search, and bounded source windows
+       |
+       v
+[Patch]
+  relevant pages, acceptance contract, and one canonical diff
+       |
+       v
+[Host verification]
+  transactional apply, focused tests, acceptance oracle, bounded recovery
 ```
 
-### Key Economic & Quality Advantages:
-- **Zero Quality Degradation**: Luna 5.6 High operates at full cognitive capacity on the causal core without missing broader context (context is mapped via AST).
-- **85%+ Reasoning Token Economy**: Replaces 10-15 reasoning turns with exactly 1 synthesis burst.
-- **Circuit Breaker Protected**: If verification fails, at most 1 targeted repair turn is permitted before tripping the breaker.
+This arrangement reduces repeated context without claiming that the model's
+reasoning is predictable. The verification result, not the model response, is
+the acceptance signal.
+
+## 4. Circuit-breaker rule
+
+The runtime must stop recovery when the configured attempt count is exhausted.
+The default is intentionally finite. A caller can raise the limit for a known
+workload, but the benchmark report must record the setting.

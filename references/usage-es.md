@@ -1,61 +1,57 @@
-# Guía Rápida de Astra-Ultra
+# Guía rápida de Astra-Ultra
 
-**Astra-Ultra** es una skill personal y modular para **OpenAI Codex** y sus modelos (**Luna 5.6**, **Terra**, **o1**, **o3-mini**, **o3** y **GPT-4o**). Su propósito es sencillo: **optimizar el consumo de tokens y maximizar el reúso de contexto manteniendo la integridad sintáctica de tu código**.
+Astra-Ultra es una skill para OpenAI Codex y sus modelos públicos, incluidos
+`o1`, `o3`, `o3-mini` y `gpt-4o`. Reduce el contexto repetido y mantiene las
+pruebas y la aplicación de parches fuera del modelo.
 
----
+## Uso en Codex
 
-## 1. Cómo Usarlo en Codex
-
-Podés invocarlo explícitamente en cualquier tarea diciendo:
+Podés invocarla en una tarea con:
 
 ```text
 Usá $astra-ultra para esta tarea.
 ```
 
-O simplemente describí lo que necesitás de forma natural. La economía de tokens y el cuidado de tu cuota es responsabilidad del agente, no tuya: no tenés que hablar de forma comprimida ni omitir detalles importantes.
+La skill también puede actuar de forma indirecta cuando el entorno la carga
+como parte de la configuración del proyecto.
 
----
+## Cinco mecanismos
 
-## 2. Los 5 Mecanismos Clave (En palabras simples)
+1. **Cuantización de prefijos (`astra_prefix_lock.py`):** alinea el texto
+   estático a bloques de 128 tokens después del umbral de caché. El resultado
+   es una ayuda para estabilizar el prefijo, no una garantía de cache hit.
+2. **Mapa del repositorio (`astra_repomap.py`):** rankea archivos y símbolos
+   con PageRank dentro de un presupuesto de tokens.
+3. **Esqueletos AST (`astra_ast.py`):** conserva clases, firmas, tipos y
+   docstrings, pero reemplaza los cuerpos por `...` o `pass`.
+4. **Filtro de salida (`astra_sanitizer.py`):** guarda el log completo en disco
+   y muestra un resumen acotado con las últimas 25 líneas del fallo.
+5. **Ejecución en dos fases (`astra_governor.py`):** las herramientas
+   deterministas localizan el problema y el modelo recibe sólo las páginas
+   necesarias para producir el parche.
 
-1. **Bloqueo de Caché y Cuantización a 128 Tokens (`astra_prefix_lock.py`):**
-   OpenAI almacena en caché instrucciones estáticas en múltiplos de 128 tokens a partir de 1,024 tokens. Astra-Ultra congela las cabeceras fijas y alinea el texto estático para **ayudar a estabilizar prefijos y mejorar las probabilidades de reúso de caché (aprovechando los descuentos del 50% al 90% en tokens de entrada)**.
-
-2. **Mapa del Repositorio en <1,024 Tokens (`astra_repomap.py`):**
-   En lugar de volcar carpetas enteras en el chat, calcula qué archivos y funciones son las más importantes usando PageRank y las resume en menos de 1,024 tokens.
-
-3. **Esqueletos AST (`astra_ast.py`):**
-   Si el modelo necesita ver una clase o API, lee la estructura completa con tipos y docstrings pero sin los cuerpos de las funciones (`...`), consumiendo menos de 50 tokens por archivo.
-
-4. **Filtro de Ruido en Terminal (`astra_sanitizer.py`):**
-   Cuando corrés tests (`pytest`, `cargo`, `npm`), no deja que 5,000 líneas de logs inunden el contexto. Guarda el log completo en el disco y te muestra solo el resumen y las últimas 25 líneas con el error exacto.
-
-5. **Protocolo Asimétrico para Luna 5.6 High (`astra_governor.py`):**
-   Los modelos de razonamiento profundo gastan miles de tokens pensando. Poner a Luna 5.6 High a buscar archivos gasta tu límite de 5 horas enseguida. Astra-Ultra hace la búsqueda con herramientas livianas y le entrega a Luna **solo la función de 30 líneas con el bug en turnos acotados** para que resuelva la lógica matemática o concurrente.
-
----
-
-## 3. Comandos Útiles de Consola
-
-Si querés usar las herramientas por tu cuenta desde la terminal:
+## Comandos
 
 ```bash
-# Ver el mapa de símbolos optimizado del proyecto
+# Ver el mapa de símbolos del proyecto
 astra-ultra map --root . --budget 1024
 
-# Ver el esqueleto limpio de cualquier archivo
+# Ver el esqueleto de un archivo
 astra-ultra skeleton --source src/app.py
 
-# Alinear un prompt al bloque de 128 tokens de OpenAI
+# Alinear un prompt a bloques de 128 tokens
 astra-ultra lock quantize --input prompt.txt --boundary 128
 
-# Ver el protocolo asimétrico de razonamiento para Luna 5.6 High
-astra-ultra govern --asymmetric
+# Obtener orientación de esfuerzo para un modelo público
+astra-ultra govern --model o3-mini --effort high
 ```
 
----
+## Verificación
 
-## 4. Garantía de Calidad
+El runtime limita paths modificables, aplica el parche con Git, ejecuta el
+comando de tests declarado y puede ejecutar una aceptación independiente. La
+suite local contiene 119 tests deterministas:
 
-- **Cero distorsión de sintaxis:** No usamos compresión agresiva destructiva (como LLMLingua) que rompe indentación o tipos.
-- **81 tests deterministas:** Cada herramienta está respaldada por una suite de pruebas unitarias que podés correr en cualquier momento con `python -m unittest discover -s tests`.
+```bash
+python -m unittest discover -s tests -p 'test_*.py'
+```
